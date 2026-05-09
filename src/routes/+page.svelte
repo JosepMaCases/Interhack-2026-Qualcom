@@ -1,11 +1,13 @@
 <script lang="ts">
-  import Main from "$lib/components/molecules/templates/Main.svelte";
-
-
+ 
+  import GltfViewer from "$lib/components/molecules/templates/GTLFContainer.svelte";
 </script>
 
 <main class="content">
-        <Main/>
+    
+    <section class="visor-section">
+        <GltfViewer modelUrl="/models/casc.glb" />
+    </section>
 </main>
 
 <style>
@@ -17,5 +19,11 @@
         padding: calc(2.5rem + 2vw);
         text-align: left;
         gap: 50px;
+    }
+
+    .visor-section {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
     }
 </style>
