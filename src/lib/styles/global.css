@@ -1,0 +1,31 @@
+:root {
+  --bg-color: #f4f4f4;
+  --text-color: #272727;
+  --white-color:#f9f9f9;
+  --grey-color: #888;
+
+  --first-color:#e17a5f;
+  --second-color:#3b405b;
+  --third-color: #80b29b;
+  --forth-color: #f2cc8f;
+
+  --transition-smooth: all 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  overflow-x: hidden;
+}
+
+.fade-in {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeIn 1s forwards ease-out;
+}
+
+@keyframes fadeIn {
+  to { opacity: 1; transform: translateY(0); }
+}
