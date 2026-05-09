@@ -21,9 +21,9 @@ const unsigned long STOPPED_AFTER_MS = 2000;
 const float MOVEMENT_DELTA_THRESHOLD = 0.08;
 const int MOVEMENT_CONFIRM_SAMPLES = 3;
 
-const int FAR_DISTANCE_MM = 800;
-const int WARNING_DISTANCE_MM = 300;
-const int CRITICAL_DISTANCE_MM = 120;
+const int FAR_DISTANCE_MM = 200;
+const int WARNING_DISTANCE_MM = 100;
+const int CRITICAL_DISTANCE_MM = 50;
 
 const int PIXEL_BRIGHTNESS = 10;
 const int BEEP_FREQUENCY = 440;
