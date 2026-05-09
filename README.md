@@ -42,6 +42,9 @@ Procés d'Entrenament:
 - Optimització: Conversió del model a un format lleuger (com TensorFlow Lite) per ser executat en un xip d'alt rendiment i baix consum.
 - Implementació Local (On-Device AI): A diferència d'altres sistemes que envien el vídeo a un servidor, la nostra IA corre directament en un microxip dedicat integrat al casc. Això garanteix:
 
+<img width="512" height="512" alt="unknown 6o3ec6b0 ingestion-774b75fcb-lgb7p" src="https://github.com/user-attachments/assets/01041111-9895-4563-ac2f-ebe2a6e025d6" /><img width="512" height="512" alt="unknown 6o3ed6v2 ingestion-774b75fcb-jwg66" src="https://github.com/user-attachments/assets/4cc178a2-95cd-4027-badc-b36ab2577336" />
+<img width="512" height="512" alt="unknown 6o3egrjb" src="https://github.com/user-attachments/assets/f84c1097-1ae6-47f5-82ed-4c7452dd2631" />
+
 Característiques del model
 - Latència mínima: L'alerta és instantània (crític per evitar col·lisions).
 - Privadesa: No s'emmagatzemen ni s'envien imatges de la via pública; el sistema només genera alertes i dades numèriques anònimes.
