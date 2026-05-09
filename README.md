@@ -3,7 +3,7 @@
 Els usuaris de micro-mobilitat (bicis, patinets) són invisibles a la xarxa viària. La velocitat i la proximitat d'objectes imprevistos causen milers d'accidents anuals per falta de temps de reacció. A més, són un col·lectiu amb més exposició de contaminació de l'aire, cosa que a llarg termini pot provocar problemes greus de salut. 
 
 
-**Què és ...?**
+**QUÈ ÉS ...?**
 
 ... és un sistema d'assistència activa i monitorització urbana integrat en cascs de protecció. El projecte neix per resoldre la vulnerabilitat dels ciclistes i usuaris de patinets davant d'objectes estàtics o en moviment en la xarxa viària.
 Mitjançant una càmera amb intel·ligència artificial, el casc actua com un "copilot" que vigila l'entorn on la vista de l'usuari no arriba. A més, el dispositiu funciona com una estació mòbil de recollida de dades ambientals, permetent generar un mapa hiper-local de la qualitat de l'aire i de la seguretat viària a Barcelona.
@@ -15,7 +15,7 @@ OBJECTIUS DEL PROJECTE:
 - Incentivar la mobilitat sostenible: Oferir una eina que aporti prou seguretat perquè més ciutadans s'animin a utilitzar el transport personal no motoritzat.
 
 
-**Com utilitzar-lo**
+**COM UTILITZAR-LO?**
 
 L'ecosistema DuckSafe es divideix en tres punts de contacte:
   1. El Casc Intel·ligent: L'usuari només s'ha de posar el casc i iniciar la marxa. El sistema comença a processar el vídeo automàticament.
@@ -25,13 +25,28 @@ L'ecosistema DuckSafe es divideix en tres punts de contacte:
   3. Plataforma Web (Mapa de dades): L'usuari (i l'ajuntament) pot accedir a una aplicació web on es visualitza un mapa interactiu de Barcelona. En aquest mapa es reflecteixen les rutes segures i les dades recollides pels sensors de temperatura i humitat.
 
 
-**Hardware**
+**HARDWARE**
 
 
-**Software**
+**SOFTWARE**
 
+**Entrenament de la IA**
 
-**Perspectiva de futur**
+Per a la detecció de col·lisions en temps real amb baixa latència, hem implementat un model de TinyML utilitzant la plataforma Edge Impulse. Això ens permet realitzar l'Edge Computing: el processament de la imatge es fa localment en el dispositiu sense necessitat de dependre del núvol.
+
+Procés d'Entrenament:
+- Adquisició de Dades: Creació d'un dataset propi amb més de 100 de captures d'ànecs, realitzades amb la webcam *logi105* de goma en diferents angles, distàncies i condicions de llum per simular obstacles viaris.
+- Disseny de l'Impulse: Pre-processat d'imatges per optimitzar el consum de memòria.
+- Extracció de característiques mitjançant blocs de processament d'imatge.
+- Model de Detecció: Entrenament d'una xarxa neuronal optimitzada per a dispositius mòbils (Object Detection).
+- Optimització: Conversió del model a un format lleuger (com TensorFlow Lite) per ser executat en un xip d'alt rendiment i baix consum.
+- Implementació Local (On-Device AI): A diferència d'altres sistemes que envien el vídeo a un servidor, la nostra IA corre directament en un microxip dedicat integrat al casc. Això garanteix:
+
+Característiques del model
+- Latència mínima: L'alerta és instantània (crític per evitar col·lisions).
+- Privadesa: No s'emmagatzemen ni s'envien imatges de la via pública; el sistema només genera alertes i dades numèriques anònimes.
+
+**PERSPECTIVA DE FUTUR**
 
 Per transformar aquest prototip en un producte de mercat, el nostre full de ruta inclou:
 1. IA d'Alt Rendiment i Visió 360°:
