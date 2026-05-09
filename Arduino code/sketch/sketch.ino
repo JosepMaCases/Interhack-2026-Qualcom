@@ -1,31 +1,45 @@
-#include <Arduino_Modulino.h>
-#include <Arduino_RouterBridge.h>
+#include "ModulinoSensors.h"
 
-ModulinoDistance distance;
+ModulinoSensors sensors;
 
-unsigned long previousMillis = 0;
-const long interval = 100; // cada 100ms
+const unsigned long SENSOR_INTERVAL_MS = 1000;
+unsigned long lastSensorReadMs = 0;
 
 void setup() {
-  Bridge.begin();
+  sensors.begin();
 
-  Modulino.begin(Wire1);
-
-  while (!distance.begin()) {
-    delay(1000);
-  }
+  sensors.clearPixels();
+  sensors.showPixels();
 }
 
 void loop() {
-  unsigned long currentMillis = millis();
+  unsigned long now = millis();
+  if (now - lastSensorReadMs < SENSOR_INTERVAL_MS) {
+    return;
+  }
 
-  if (currentMillis - previousMillis >= interval) {
-    previousMillis = currentMillis;
+  lastSensorReadMs = now;
 
-    if (distance.available()) {
-      int distance_mm = distance.get();
+  if (sensors.distanceAvailable()) {
+    int distanceMm = sensors.distanceMillimeters();
+    sensors.notifyDistance(distanceMm);
 
-      Bridge.notify("record_distance", distance_mm);
+    if (distanceMm < 100) {
+      sensors.setAllPixels(RED, 10);
+      sensors.showPixels();
+      sensors.playTone(440, 250);
+      sensors.vibrate(100);
+    } else {
+      sensors.clearPixels();
+      sensors.showPixels();
+      sensors.stopTone(100);
+      sensors.stopVibration();
     }
+  }
+
+  sensors.notifyThermo();
+
+  if (sensors.updateMovement()) {
+    sensors.notifyMovement();
   }
 }
