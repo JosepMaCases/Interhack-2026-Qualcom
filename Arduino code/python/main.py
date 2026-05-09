@@ -1,13 +1,15 @@
-import time
-from arduino_bridge import bridge
+from arduino.app_utils import *
 
-while True:
-    result = bridge.call("get_distance")
-    distance_mm = int(result)
+logger = Logger("distance-app")
 
-    if distance_mm >= 0:
-        print(f"Distància: {distance_mm} mm")
-    else:
-        print("No detecta objecte")
+def record_distance(distance_mm: float):
 
-    time.sleep(0.2)
+    print(f"Distància: {distance_mm} mm")
+
+try:
+    Bridge.provide("record_distance", record_distance)
+
+except RuntimeError:
+    logger.debug("'record_distance' already registered")
+
+App.run()

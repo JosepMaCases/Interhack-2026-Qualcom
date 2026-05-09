@@ -1,25 +1,31 @@
+#include <Arduino_Modulino.h>
 #include <Arduino_RouterBridge.h>
-#include <Modulino.h>
-
-Bridge Bridge;
 
 ModulinoDistance distance;
 
-int get_distance() {
-  if (distance.available()) {
-    return distance.get();   // retorna mm
-  }
-  return -1; // cap objecte o lectura no disponible
-}
+unsigned long previousMillis = 0;
+const long interval = 100; // cada 100ms
 
 void setup() {
-  Modulino.begin();
-  distance.begin();
-
   Bridge.begin();
-  Bridge.provide("get_distance", get_distance);
+
+  Modulino.begin(Wire1);
+
+  while (!distance.begin()) {
+    delay(1000);
+  }
 }
 
 void loop() {
-  Bridge.update();
+  unsigned long currentMillis = millis();
+
+  if (currentMillis - previousMillis >= interval) {
+    previousMillis = currentMillis;
+
+    if (distance.available()) {
+      int distance_mm = distance.get();
+
+      Bridge.notify("record_distance", distance_mm);
+    }
+  }
 }
