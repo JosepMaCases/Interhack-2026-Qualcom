@@ -1,21 +1,10 @@
-<script lang="ts">
-  import Main from "$lib/components/molecules/templates/Main.svelte";
-
+<script>
+  import Header from '$lib/components/molecules/templates/Header.svelte';
+  import About from '$lib/components/molecules/templates/Header.svelte';
+  import Main from '$lib/components/molecules/templates/Main.svelte';
 
 </script>
 
-<main class="content">
-        <Main/>
+<main>
+    <Main/>
 </main>
-
-<style>
-    .content {
-        display: flex;
-        flex-direction: column;
-        max-width: 1200px;
-        margin: auto; 
-        padding: calc(2.5rem + 2vw);
-        text-align: left;
-        gap: 50px;
-    }
-</style>
