@@ -1,11 +1,28 @@
 ** POSAR UN NOM DE PROJECTE **
+Els usuaris de micro-mobilitat (bicis, patinets) són invisibles a la xarxa viària. La velocitat i la proximitat d'objectes imprevistos causen milers d'accidents anuals per falta de temps de reacció. A més, són un col·lectiu amb més exposició de contaminació de l'aire, cosa que a llarg termini pot provocar problemes greus de salut. 
+
+Què és ...?
+... és un sistema d'assistència activa i monitorització urbana integrat en cascs de protecció. El projecte neix per resoldre la vulnerabilitat dels ciclistes i usuaris de patinets davant d'objectes estàtics o en moviment en la xarxa viària.
+Mitjançant una càmera amb intel·ligència artificial, el casc actua com un "copilot" que vigila l'entorn on la vista de l'usuari no arriba. A més, el dispositiu funciona com una estació mòbil de recollida de dades ambientals, permetent generar un mapa hiper-local de la qualitat de l'aire i de la seguretat viària a Barcelona.
 
 OBJECTIUS DEL PROJECTE: 
+- Reduir la sinistralitat: Alertar proactivament sobre possibles col·lisions mitjançant el processament d'imatges en temps real.
+- Digitalitzar la seguretat: Identificar punts crítics de la ciutat on es produeixen més frenades brusques o situacions de risc.
+- Monitorització Ambiental: Crear un mapa detallat de temperatura i humitat de cada carrer per ajudar als usuaris amb les seves decisionns vials, a més de l'Ajuntament a prendre decisions sobre salut pública.
+- Incentivar la mobilitat sostenible: Oferir una eina que aporti prou seguretat perquè més ciutadans s'animin a utilitzar el transport personal no motoritzat.
 
-- Elaborar un sistema de detecció de col·lisió i alerta d'objectes estatics i en moviment integrat en cascs de protecció homologats com a eina accesoria en la circulació. El sistema detecta 
-objectes en moviment simulant una realitat de la xarxa viaria. 
+Com utilitzar-lo
+L'ecosistema DuckSafe es divideix en tres punts de contacte:
+  1. El Casc Intel·ligent: L'usuari només s'ha de posar el casc i iniciar la marxa. El sistema comença a processar el vídeo automàticament.
+  2. Sistema d'Alertes (HMI):
+     Visual: Un dispositiu instal·lat al manillar emet un parpelleig a una freqüència de 2Hz quan detecta un perill imminent.
+     Sensorial: El casc emet un senyal acústic i una vibració física per assegurar que l'usuari reaccioni fins i tot en entorns amb molt de soroll.
+  3. Plataforma Web (Mapa de dades): L'usuari (i l'ajuntament) pot accedir a una aplicació web on es visualitza un mapa interactiu de Barcelona. En aquest mapa es reflecteixen les rutes segures i les dades recollides pels sensors de temperatura i humitat.
 
-Ens trobem amb el problema de la velocitat i proximitat dels objectes.
+Components del Sistema
+Hardware
+
+Software
 
 TECNOLOGIES UTILITZADES: 
 
