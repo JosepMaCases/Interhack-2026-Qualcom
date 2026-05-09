@@ -85,6 +85,14 @@ public:
     }
   }
 
+  void setPixelBar(int count, ModulinoColor color, int brightness) {
+    pixels.clear();
+
+    for (int pixel = 0; pixel < count && pixel < 8; pixel++) {
+      pixels.set(pixel, color, brightness);
+    }
+  }
+
   void showPixels() {
     pixels.show();
   }
@@ -107,6 +115,10 @@ public:
 
   void notifyMovement() {
     Bridge.notify("record_movement", movementX(), movementY(), movementZ());
+  }
+
+  void notifyStatus(bool moving, int distanceMm, int zone) {
+    Bridge.notify("record_status", moving ? 1 : 0, distanceMm, zone);
   }
 
 private:
