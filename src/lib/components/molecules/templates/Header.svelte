@@ -36,7 +36,7 @@
 
 <header class:sticky={isScrolled}>
   <div class="nav-section">
-    <button class="brand-btn" onclick={() => navigateTo('/about')} title="Sobre nosotros">
+    <button class="brand-btn" onclick={() => navigateTo('/about')} title="Sobre nosaltres">
       <img src="/icons/logo.png" alt="Logo SafeHelmet" aria-label="duck-logo" />SafeHelmet
     </button>
     <button class="nav-btn" onclick={() => navigateTo('/map')} title="Ir a mapa">
