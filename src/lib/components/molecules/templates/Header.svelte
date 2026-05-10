@@ -36,7 +36,7 @@
 
 <header class:sticky={isScrolled}>
   <div class="nav-section">
-    <button class="nav-btn" onclick={() => navigateTo('/about')} title="Sobre nosotros">
+    <button class="brand-btn" onclick={() => navigateTo('/about')} title="Sobre nosotros">
       SafeHelmet
     </button>
     <button class="nav-btn" onclick={() => navigateTo('/map')} title="Ir a mapa">
@@ -66,12 +66,17 @@
     padding: 1rem 2rem;
     z-index: 100;
     transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
-    border-bottom: none;
-    margin: 0 1.5rem;
+    margin: 0.9rem 1.5rem 0;
+    border: 1px solid rgba(242, 204, 143, 0.28);
+    border-radius: 8px;
+    background: rgba(244, 244, 240, 0.52);
+    backdrop-filter: blur(16px);
+    box-shadow: 0 12px 36px rgba(39, 39, 39, 0.06);
   }
 
   header.sticky {
     padding: 0.75rem 2rem;
+    background: rgba(244, 244, 240, 0.66);
   }
 
   .nav-section {
@@ -85,6 +90,7 @@
     justify-content: flex-end;
   }
 
+  .brand-btn,
   .nav-btn,
   .menu-btn, 
   .nav-text {
@@ -101,9 +107,21 @@
   }
 
   .nav-btn:hover,
+  .brand-btn:hover,
   .menu-btn:hover {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(39, 39, 39, 0.08);
     transform: translateY(-2px);
+  }
+
+  .brand-btn {
+    width: auto;
+    height: 40px;
+    padding: 0.5rem 0.35rem;
+    color: #3b405b;
+    font-size: 1.12rem;
+    font-weight: 800;
+    letter-spacing: 0.01em;
+    text-shadow: 0 1px 8px rgba(255, 255, 255, 0.22);
   }
 
   .nav-btn {
