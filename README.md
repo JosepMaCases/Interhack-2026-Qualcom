@@ -208,7 +208,7 @@ Com a consequencia hem utilitzat un model previament entrenat per la compañia Q
 
 Per transformar aquest prototip en un producte de mercat, el nostre full de ruta inclou:
 1. IA d'Alt Rendiment i Visió 360°:
-- Reconeixement Multiobjecte: Entrenament del model per identificar vehicles, vianants, senyals de trànsit i animals amb un percentatge d'error proper al zero.ç
+- Reconeixement Multiobjecte: Entrenament del model per identificar vehicles, vianants, senyals de trànsit i animals amb un percentatge d'error proper al zero.
 - Visió Nocturna: Implementació de sensors infrarojos per mantenir la seguretat durant la conducció nocturna o en túnels.
 
 2. Monitorització Ambiental Avançada
