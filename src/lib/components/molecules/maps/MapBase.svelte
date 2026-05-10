@@ -6,10 +6,11 @@
   import { THEMES } from '$lib/components/molecules/maps/themes';
   import { generateStyleFromTheme } from '$lib/styles/maps/styleFactory';
 
-  export let themeName: keyof typeof THEMES = 'GLOBE_3D_GREEN'; 
-  
-  // Exportem la instància per si el pare vol afegir markers manualment
-  export let mapInstance: maplibregl.Map | undefined = undefined;
+  let { 
+    themeName = 'GLOBE_3D_GREEN', 
+    mapInstance = $bindable(),
+    children
+  } = $props();
 
   let mapContainer: HTMLDivElement;
   const dispatch = createEventDispatcher();
@@ -33,10 +34,9 @@
       zoom: theme.zoom,
       minZoom: theme.minZoom || 0,
       maxZoom: theme.maxZoom || 20,
-      pitch: theme.features.showTerrain ? -80 : 0,
+      pitch: theme.features.showTerrain ? 60 : 0,
       maxPitch: theme.maxPitch,
       attributionControl: attribution as any,
-      interactive:false
     });
 
     mapInstance.addControl( new maplibregl.ScaleControl(),
@@ -59,7 +59,7 @@
 </script>
 
 <div bind:this={mapContainer}>
-    <slot /> 
+    {@render children()}
 </div>
 
 <style>

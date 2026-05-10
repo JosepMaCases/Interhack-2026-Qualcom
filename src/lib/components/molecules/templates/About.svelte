@@ -1,71 +1,56 @@
 <script>
-  import { fade } from 'svelte/transition';
-
-  let {sections = [ 
-    {
-        title:"Ours",
-        description: ""
-     }
-  ]} = $props()
+    import GltfViewer from "$lib/components/molecules/templates/GTLFContainer.svelte";
 </script>
 
-<section class="about-container" transition:fade={{ duration: 300 }}>
-  <div class="content">
-    <article>
-      <h2>Who We Are</h2>
-      <p>Innovadores en seguridad vial...</p>
-    </article>
-
-    <article>
-      <h2>Why?</h2>
-      <p>Reducimos el tiempo de respuesta en accidentes en un 40%.</p>
-    </article>
-
-    <div class="model-3d" >
-      <p class="placeholder">Cargando modelo 3D del Casco...</p>
-    </div>
-
-    <div class="buy-section">
-      <button class="buy-now">Buy Now</button>
-    </div>
-  </div>
+<section class="about-container">
+  <section class="section">
+    <h2>¿Quienes somos?</h2>
+    <p>
+      Somos una compañía comprometida con la seguridad vial, nuestro objetivo 
+      es ayudar a mejorar cómo conducimos, desde bicicletas a patinetes. 
+    </p>
+    <button class="buy-btn">COMPRA</button>
+  </section>
+  <section class="section">
+    <section class="visor-section">
+        <GltfViewer modelUrl="/models/casc.glb" />
+    </section>
+  </section>
 </section>
 
 <style>
-  .about-container { padding: 4rem 2rem; max-width: 1200px; margin: auto; }
-  .model-3d { 
-    height: 400px; 
-    background: #1a1a1a; 
-    border-radius: 15px; 
-    margin: 2rem 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  .about-container {
+    display: grid;
+    grid-template-columns: minmax(400px, 1fr) 2fr;
+    gap: 2rem;
+    margin: 7rem 2rem;
+    gap: 3rem;
   }
-  .buy-now {
-    background: #ff3e00;
-    color: white;
-    padding: 1rem 3rem;
-    border: none;
-    font-weight: bold;
-    border-radius: 5px;
-    cursor: pointer;
+  h2 {
+    text-transform: uppercase;
+    font-size: 1.3rem;
+    color: var(----text-color);
+    margin: 0;
   }
-  .intro-page {
-        height: 100svh;
-        width: 100%;
-        margin: auto;
-    }
 
-    h1 {
-        font-size: clamp(3rem, 8vw, 6rem); 
-        font-weight: 800;
-        text-transform: uppercase;
-        letter-spacing: calc(2px + 0.5vw);
-    }
-    .subtitle {
-        font-size: clamp(1.5rem, 8vw, 1.5rem); 
-        font-size: 1.5rem;
-        font-weight: 300;
-    }
+  p {
+    font-size: clamp(1.3rem, 6vw, 2rem);
+  }
+
+  .visor-section {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+  }
+
+  .buy-btn {
+    color: var(--bg-color);
+    font-size: 1rem;
+    font-weight: 500;
+    background-color: var(--second-color);
+    padding: 0.35rem .5rem;
+    border: none;
+    border-radius: 16px;
+  }
+
 </style>

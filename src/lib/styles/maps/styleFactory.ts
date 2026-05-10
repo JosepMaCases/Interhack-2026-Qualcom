@@ -264,7 +264,7 @@ export function generateStyleFromTheme(theme: MapTheme): StyleSpecification {
         sources: sources,
         layers: layers,
         terrain: features.showTerrain 
-            ? { source: 'terrain-dem', exaggeration: 2.5 } 
+            ? { source: 'terrain-dem', exaggeration: 1.5 } 
             : undefined
     };
 }

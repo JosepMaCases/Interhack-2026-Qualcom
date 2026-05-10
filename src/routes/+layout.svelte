@@ -1,10 +1,18 @@
 <script>
   import "../lib/styles/global.css";
   import Header from "$lib/components/molecules/templates/Header.svelte";
+  import Sidebar from "$lib/components/molecules/templates/Sidebar.svelte";
+
   let { children } = $props();
+  let sidebarOpen = $state(false);
+
+  $effect(() => {
+    sidebarOpen = false;
+  });
 </script>
 
-<Header />
+<Header bind:sidebarOpen />
+<Sidebar bind:isOpen={sidebarOpen} />
 
 <main>
   {@render children?.()}
@@ -12,7 +20,6 @@
 
 <style>
   main {
-    min-height: 100vh;
     display: flex;
     flex-direction: column;
   }
