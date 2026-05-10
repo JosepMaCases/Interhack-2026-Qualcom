@@ -1,6 +1,7 @@
 from base64 import b64decode
 from datetime import datetime, UTC
 from io import BytesIO
+import random
 import time
 
 from PIL import Image, ImageDraw
@@ -47,10 +48,39 @@ latest_sensors = {
         },
         "updated_at": None,
     },
+    "environment": {
+        "synthetic": True,
+        "updated_at": None,
+        "noise": {
+            "db_a": 0.0,
+            "zone": "OK",
+            "who_limit_db_a": 53,
+        },
+        "pollution": {
+            "pm25_ug_m3": 0.0,
+            "pm10_ug_m3": 0.0,
+            "no2_ug_m3": 0.0,
+            "zone": "OK",
+            "who_limits": {
+                "pm25_ug_m3": 15,
+                "pm10_ug_m3": 45,
+                "no2_ug_m3": 25,
+            },
+        },
+        "overall_zone": "OK",
+    },
     "updated_at": None,
 }
 last_detection_seen_ts = 0
 latest_detections = []
+last_environment_update_ts = 0
+traffic_episode_until_ts = 0
+environment_state = {
+    "noise_db_a": 56.0,
+    "pm25_ug_m3": 10.0,
+    "pm10_ug_m3": 24.0,
+    "no2_ug_m3": 16.0,
+}
 LABEL_COLORS = [
     (0, 255, 0),
     (0, 170, 255),
@@ -83,6 +113,19 @@ API_HEADERS = {
     "Access-Control-Allow-Headers": "*",
     "Access-Control-Allow-Private-Network": "true",
     "Cache-Control": "no-store",
+}
+ENVIRONMENT_INTERVAL_SEC = 2.0
+WHO_LIMITS = {
+    "noise_db_a": 53,
+    "pm25_ug_m3": 15,
+    "pm10_ug_m3": 45,
+    "no2_ug_m3": 25,
+}
+ZONE_RANK = {
+    "OK": 0,
+    "WARNING": 1,
+    "DANGER": 2,
+    "CRITICAL": 3,
 }
 
 ZONES = {
@@ -326,6 +369,137 @@ def calculate_visual_proximity(detections):
     }
 
 
+def clamp(value: float, min_value: float, max_value: float):
+    return max(min_value, min(max_value, value))
+
+
+def move_towards(current: float, target: float, max_step: float):
+    delta = target - current
+    if abs(delta) <= max_step:
+        return target
+
+    return current + max_step if delta > 0 else current - max_step
+
+
+def zone_from_ratio(value: float, limit: float, critical_override=False):
+    if critical_override or value >= limit * 2:
+        return "CRITICAL"
+
+    if value >= limit * 1.5:
+        return "DANGER"
+
+    if value > limit:
+        return "WARNING"
+
+    return "OK"
+
+
+def worst_zone(*zones):
+    return max(zones, key=lambda zone: ZONE_RANK.get(zone, 0))
+
+
+def maybe_start_traffic_episode(now: float):
+    global traffic_episode_until_ts
+
+    if now < traffic_episode_until_ts:
+        return
+
+    if random.random() < 0.18:
+        traffic_episode_until_ts = now + random.uniform(10, 22)
+
+
+def update_environment():
+    global last_environment_update_ts
+
+    now = time.time()
+    if now - last_environment_update_ts < ENVIRONMENT_INTERVAL_SEC:
+        return
+
+    last_environment_update_ts = now
+    maybe_start_traffic_episode(now)
+    traffic_active = now < traffic_episode_until_ts
+
+    if traffic_active:
+        targets = {
+            "noise_db_a": random.uniform(68, 85),
+            "pm25_ug_m3": random.uniform(20, 45),
+            "pm10_ug_m3": random.uniform(50, 120),
+            "no2_ug_m3": random.uniform(35, 75),
+        }
+    else:
+        targets = {
+            "noise_db_a": random.uniform(48, 65),
+            "pm25_ug_m3": random.uniform(5, 18),
+            "pm10_ug_m3": random.uniform(12, 45),
+            "no2_ug_m3": random.uniform(8, 30),
+        }
+
+    environment_state["noise_db_a"] = clamp(
+        move_towards(environment_state["noise_db_a"], targets["noise_db_a"], 4.5)
+        + random.uniform(-1.2, 1.2),
+        42,
+        88,
+    )
+    environment_state["pm25_ug_m3"] = clamp(
+        move_towards(environment_state["pm25_ug_m3"], targets["pm25_ug_m3"], 3.0)
+        + random.uniform(-0.6, 0.6),
+        2,
+        55,
+    )
+    environment_state["pm10_ug_m3"] = clamp(
+        move_towards(environment_state["pm10_ug_m3"], targets["pm10_ug_m3"], 8.0)
+        + random.uniform(-1.5, 1.5),
+        5,
+        130,
+    )
+    environment_state["no2_ug_m3"] = clamp(
+        move_towards(environment_state["no2_ug_m3"], targets["no2_ug_m3"], 5.0)
+        + random.uniform(-1.0, 1.0),
+        3,
+        85,
+    )
+
+    noise = round(environment_state["noise_db_a"], 1)
+    pm25 = round(environment_state["pm25_ug_m3"], 1)
+    pm10 = round(environment_state["pm10_ug_m3"], 1)
+    no2 = round(environment_state["no2_ug_m3"], 1)
+
+    noise_zone = zone_from_ratio(
+        noise,
+        WHO_LIMITS["noise_db_a"],
+        critical_override=noise >= 75,
+    )
+    pollution_zone = worst_zone(
+        zone_from_ratio(pm25, WHO_LIMITS["pm25_ug_m3"]),
+        zone_from_ratio(pm10, WHO_LIMITS["pm10_ug_m3"]),
+        zone_from_ratio(no2, WHO_LIMITS["no2_ug_m3"]),
+    )
+    overall_zone = worst_zone(noise_zone, pollution_zone)
+
+    latest_sensors["environment"] = {
+        "synthetic": True,
+        "updated_at": now_iso(),
+        "traffic_episode": traffic_active,
+        "noise": {
+            "db_a": noise,
+            "zone": noise_zone,
+            "who_limit_db_a": WHO_LIMITS["noise_db_a"],
+        },
+        "pollution": {
+            "pm25_ug_m3": pm25,
+            "pm10_ug_m3": pm10,
+            "no2_ug_m3": no2,
+            "zone": pollution_zone,
+            "who_limits": {
+                "pm25_ug_m3": WHO_LIMITS["pm25_ug_m3"],
+                "pm10_ug_m3": WHO_LIMITS["pm10_ug_m3"],
+                "no2_ug_m3": WHO_LIMITS["no2_ug_m3"],
+            },
+        },
+        "overall_zone": overall_zone,
+    }
+
+
 def get_camera():
     return StreamingResponse(
         camera_stream(),
@@ -336,6 +510,8 @@ def get_camera():
 
 def get_sensors():
     global latest_detections
+
+    update_environment()
 
     if time.time() - last_detection_seen_ts > 1.0:
         latest_sensors["object_detection"]["detected"] = False
