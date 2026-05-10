@@ -67,6 +67,16 @@ La interfície web ha estat principalment estructurada amb:
 - Anàlisi de velocitat d'objectes
 - Sistema en temps real
 
+### Web Notifications
+- Browser popup alerts shown on the camera page
+- Triggered when a person is detected near the critical zone
+- Environmental alerts for high noise levels or poor air quality
+- Alerts are rate-limited to avoid repeated notifications
+- Messages are short and actionable, for example:
+  - `Person nearby: getting close to the critical zone.`
+  - `Noise is high. Consider moving to a quieter area.`
+  - `Air quality is poor.`
+
 ## 📁 Estructura del Projecte
 
 ```
@@ -117,6 +127,30 @@ npm run preview  # Veure la previsualització del build
 npm run check          # Svelte check
 npm run check:watch    # Check en mode watch
 ```
+
+## Arduino App Lab Structure
+
+This project uses Arduino App Lab with:
+
+- `sketch/` → Arduino `.ino` firmware running on the MCU
+- `python/` → Python application running on Linux
+- Bridge communication between Arduino and Python
+
+Arduino Project structure in Arduino App Lab:
+
+```text
+project/
+├── sketch/
+│   ├── sketch.ino
+│   ├── DistanceSensor.ino
+│   ├── BuzzerModule.ino
+│   ├── PixelsModule.ino
+│   └── ThermoModule.ino
+│
+├── python/
+│   └── main.py
+│
+└── app.yml
 
 ## 🎨 Paleta de Colors
 
