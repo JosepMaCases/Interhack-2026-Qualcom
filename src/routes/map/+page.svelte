@@ -101,8 +101,8 @@
                     id="mapa-obres"
                     sourceType="vector"
                     type="fill"
-                    url="URL_DE_TU_FUENTE_OBRES"
-                    sourceLayer="obres_layer"
+                    url="pmtiles://https://www.365-charts.com/obres_bcn_2026.pmtiles"
+                    sourceLayer="mapa_obres_corregido"
                     paint={{
                         'fill-color': '#f39c12',
                         'fill-outline-color': '#d35400',
