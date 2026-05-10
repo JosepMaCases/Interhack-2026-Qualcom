@@ -64,10 +64,10 @@
     grid-template-columns: auto 1fr auto;
     align-items: center;
     padding: 1rem 2rem;
-    backdrop-filter: blur(8px);
     z-index: 100;
     transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
     border-bottom: none;
+    margin: 0 1.5rem;
   }
 
   header.sticky {
@@ -130,7 +130,7 @@
   }
 
   .nav-text:hover {
-    color: #ff8800;
+    color: var(--second-color);
   }
 
   .menu-btn {

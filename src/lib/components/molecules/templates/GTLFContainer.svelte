@@ -14,7 +14,7 @@
         scene.background = new THREE.Color(0xf0f0f0);
 
         const camera = new THREE.PerspectiveCamera(75, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
-        camera.position.set(0, 1, 3);
+        camera.position.set(0, 5, 25);
 
         const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
         renderer.setSize(canvas.clientWidth, canvas.clientHeight);
@@ -77,7 +77,7 @@
 <style>
     .canvas-container {
         width: 100%;
-        height: 500px;
+        height: 80svh;
         border-radius: 12px;
         overflow: hidden;
         box-shadow: 0 4px 10px rgba(0,0,0,0.1);
