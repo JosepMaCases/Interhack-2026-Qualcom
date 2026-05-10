@@ -54,7 +54,7 @@ export const THEMES: Record<string, MapTheme> = {
         zoom:11.5,
         mobileZoom: 1,
         minZoom: 0,
-        maxPitch: 60,
+        maxPitch: 80,
         projection: 'globe',
         colors: {
             background: '#ffffffff',
@@ -76,10 +76,10 @@ export const THEMES: Record<string, MapTheme> = {
         },
         features: {
             showTerrain: true,
-            showRoads: false,
-            showStreetNames:false,
+            showRoads: true,
+            showStreetNames:true,
             showBuildings: true,
-            showBuildings3D: false,
+            showBuildings3D: true,
             showCountriesNames: true,
             showBoundariesADM0: true,
             texture:'world_dem_clipped.pmtiles', // nom del fitxer pmtiles
@@ -118,7 +118,7 @@ export const THEMES: Record<string, MapTheme> = {
             showRoads: true,
             showStreetNames:true,
             showBuildings: true,
-            showBuildings3D: false,
+            showBuildings3D: true,
             showCountriesNames: false,
             texture:'cat_arid.pmtiles', // 'texture_grey_min_cat.pmtiles',// nom del fitxer pmtiles
         }

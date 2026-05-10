@@ -43,6 +43,16 @@
     </MapBase>
 </div>
 
+<!-- 
+Soroll
+Contaminació de l'aire
+Accidents de Trànsit
+Obres públiques
+Congestió de trànsit
+
+
+-->
+
 <style>
   .map-wrapper {
     width: 100%;
