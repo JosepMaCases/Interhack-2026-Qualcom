@@ -15,3 +15,4 @@ ports:
 # A list of bricks used by this application.
 bricks:
   - arduino:web_ui: {}
+  - arduino:video_object_detection: {}
