@@ -36,12 +36,6 @@
             (gltf) => {
                 const model = gltf.scene;
                 scene.add(model);
-            },
-            (xhr) => {
-                console.log(`Cargando modelo: ${(xhr.loaded / xhr.total) * 100}% completado`);
-            },
-            (error) => {
-                console.error('Error al cargar el GLTF:', error);
             }
         );
 
