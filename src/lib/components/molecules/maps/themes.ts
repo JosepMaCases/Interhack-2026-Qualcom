@@ -51,7 +51,7 @@ export const THEMES: Record<string, MapTheme> = {
     'CATALONIA_3D_WHITE': {
         id: 'globe-3d-white',
         center: [2.185, 41.403],
-        zoom:11.5,
+        zoom:13.5,
         mobileZoom: 1,
         minZoom: 0,
         maxPitch: 80,

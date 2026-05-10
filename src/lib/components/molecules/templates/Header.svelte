@@ -37,7 +37,7 @@
 <header class:sticky={isScrolled}>
   <div class="nav-section">
     <button class="brand-btn" onclick={() => navigateTo('/about')} title="Sobre nosotros">
-      SafeHelmet
+      <img src="/icons/logo.png" alt="Logo SafeHelmet" aria-label="duck-logo" />SafeHelmet
     </button>
     <button class="nav-btn" onclick={() => navigateTo('/map')} title="Ir a mapa">
       <img src="/icons/map-relief.svg" alt="Mapa" />
@@ -152,6 +152,12 @@
 
   .menu-btn:hover img {
     transform: scale(1.1);
+  }
+
+  img {
+    height: 40px;
+    width: 70px;
+    object-fit: cover; 
   }
   @media (max-width: 768px) {
     header {

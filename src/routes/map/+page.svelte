@@ -10,7 +10,7 @@
     soroll: false,    // Tipo Raster
     aire: false,      // Tipo Polígono (fill)
     accidents: false, // Tipo Círculo (circle)
-    obres: false,     // Tipo Polígono (fill)
+    obres: true,     // Tipo Polígono (fill)
     congestio: false  // Tipo Línea (line)
   });
 </script>
