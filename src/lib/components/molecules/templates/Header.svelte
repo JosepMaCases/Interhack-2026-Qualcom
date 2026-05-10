@@ -21,7 +21,7 @@
     } 
   };
 
-  function navigateTo(path) { 
+  function navigateTo(path: string) {
     goto(path);
   };
 
@@ -44,6 +44,9 @@
     </button>
     <button class="nav-btn" onclick={() => navigateTo('/camera')} title="Ir a Cámara">
       <img src="/icons/camera.svg" alt="Cámara" />
+    </button>
+    <button class="nav-btn" onclick={() => navigateTo('/stats')} title="Ir a estadisticas">
+      <img src="/icons/stats.svg" alt="Estadisticas" />
     </button>
   </div>
 

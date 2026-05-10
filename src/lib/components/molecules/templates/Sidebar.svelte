@@ -1,11 +1,10 @@
 <script lang="ts">
   import { onDestroy, onMount } from 'svelte';
   import { fade, slide } from 'svelte/transition';
-
-  const ARDUINO_IP = "10.103.55.238:7000";
+  import { fetchSensors, zoneClass, type SensorData } from '$lib/sensors';
 
   let { isOpen = $bindable() } = $props();
-  let sensorData = $state<any>(null);
+  let sensorData = $state<SensorData | null>(null);
   let connectionError = $state(false);
   let intervalId: ReturnType<typeof setInterval>;
 
@@ -18,23 +17,18 @@
     return `${value}${suffix}`;
   };
 
-  const zoneClass = (zone: string | undefined) => `zone-${(zone ?? 'unknown').toLowerCase()}`;
-
   onMount(() => {
-    const fetchSensors = async () => {
+    const refreshSensors = async () => {
       try {
-        const response = await fetch(`http://${ARDUINO_IP}/sensors`);
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-
-        sensorData = await response.json();
+        sensorData = await fetchSensors();
         connectionError = false;
       } catch (error) {
         connectionError = true;
       }
     };
 
-    fetchSensors();
-    intervalId = setInterval(fetchSensors, 500);
+    refreshSensors();
+    intervalId = setInterval(refreshSensors, 500);
   });
 
   onDestroy(() => {
