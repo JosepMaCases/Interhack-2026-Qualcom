@@ -4,10 +4,10 @@
 
 <section class="about-container">
   <section class="section">
-    <h2>¿Quienes somos?</h2>
+    <h2>Qui som?</h2>
     <p>
-      Somos una compañía comprometida con la seguridad vial, nuestro objetivo 
-      es ayudar a mejorar cómo conducimos, desde bicicletas a patinetes. 
+      Som una companyia compromesa amb la seguretat vial, el nostre objectiu 
+      és ajudar a millorar la vida de les persones amb més seguretat vial, des de bicicletas a patinets.
     </p>
     <button class="buy-btn">COMPRA</button>
   </section>
