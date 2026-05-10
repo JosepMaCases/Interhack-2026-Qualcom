@@ -1,4 +1,277 @@
-Autors: Natàlia Cortés, Joan Marc Samó, Carolina Espin, Josep Mª Cases, Carlos Albaladejo
+
+ENGLISH
+
+Authors: Natàlia Cortés, Joan Marc Samó, Carolina Espin, Josep Mª Cases, Carlos Albaladejo
+
+# SafeHelmet - Collision Detection System
+
+**Project Name**: SafeHelmet
+
+## 🎯 Project Objectives
+
+- Develop a collision detection and alert system for static and dynamic objects, integrated into certified protective helmets as an accessory tool for road circulation
+- Detect moving objects simulating the reality of the road network
+- Address the risk posed by excessive speed and proximity of objects
+
+## 🏗️ Web Architecture
+
+The web interface has been primarily structured with:
+
+### Pages and Routes (SEO Optimized)
+- **`/`** - Home page with a product introduction
+- **`/map`** - Visualization of locations, incidents and other data
+- **`/camera`** - Live monitoring with active detection
+- **`/about`** - Information about the project and team
+
+### Main Components
+
+#### Enhanced Header
+- 3 columns: Map Button | Logo | About Us + Menu
+- Intuitive navigation
+- Sticky header on scroll
+
+#### Sidebar
+- Contextual menu (~25% width)
+- Only visible at `/map` and `/camera`
+- Smooth transitions
+- Overlay to close
+
+#### Modern Design
+- Color gradients (Orange #ff3e00 → Yellow #ffaa00)
+- Transitions and hover effects
+- Responsive design (Desktop, Tablet, Mobile)
+
+## 💻 Technologies Used
+
+### Frontend
+- **Svelte 5.55.2** - Reactive framework
+- **SvelteKit 2.57.0** - Full-stack framework with routing
+- **TypeScript 6.0.2** - Static typing
+- **Vite 8.0.7** - Fast build tool
+
+### Backend (Arduino)
+- **Python** - Main script
+- **Arduino IDE** - Hardware sketch
+- Collision detection via sensors
+
+## 🚨 Alert Systems
+
+### Visual Alert
+- Two hertz flashing
+- Non-saturated red LED
+- Located on the handlebar
+
+### Sound Alert and Vibration
+- System integrated into the helmet
+- Immediate proximity notification
+
+### Intelligent Detection
+- Distance identification with OpenCV (implementable)
+- Object speed analysis
+- Real-time system
+
+### Web Notifications
+- Browser popup alerts shown on the camera page
+- Triggered when a person is detected near the critical zone
+- Environmental alerts for high noise levels or poor air quality
+- Alerts are rate-limited to avoid repeated notifications
+- Messages are short and actionable, for example:
+  - `Person nearby: getting close to the critical zone.`
+  - `Noise is high. Consider moving to a quieter area.`
+  - `Air quality is poor.`
+
+## 📁 Project Structure
+
+```
+Interhack-2026-Qualcom/
+├── src/
+│   ├── routes/                    # SvelteKit routes
+│   │   ├── +layout.svelte        # Main layout
+│   │   ├── +page.svelte          # Landing
+│   │   ├── map/+page.svelte      # Map
+│   │   ├── about/+page.svelte    # Information
+│   │   └── camera/+page.svelte   # Live monitoring
+│   ├── lib/
+│   │   ├── components/
+│   │   │   └── molecules/templates/
+│   │   │       ├── Header.svelte       # Enhanced header
+│   │   │       ├── Sidebar.svelte      # Side menu
+│   │   │       ├── About.svelte        # About page
+│   │   │       └── MapLayout.svelte    # Map layout
+│   │   └── styles/
+│   │       └── global.css              # Global styles
+│   └── static/icons/             # SVG icons
+├── Arduino code/
+│   ├── sketch/
+│   │   └── sketch.ino            # Arduino code
+│   └── python/
+│       └── main.py               # Python script
+├── package.json
+└── svelte.config.js
+
+```
+
+## 🚀 How to Run
+
+### Development
+```bash
+npm install      # Install dependencies
+npm run dev      # Start server (http://localhost:5173)
+```
+
+### Production Build
+```bash
+npm run build    # Create optimized build
+npm run preview  # Preview the build
+```
+
+### Validation
+```bash
+npm run check          # Svelte check
+npm run check:watch    # Check in watch mode
+```
+
+## Arduino App Lab Structure
+
+This project uses Arduino App Lab with:
+
+- `sketch/` → Arduino `.ino` firmware running on the MCU
+- `python/` → Python application running on Linux
+- Bridge communication between Arduino and Python
+
+Arduino Project structure in Arduino App Lab:
+
+```text
+project/
+├── sketch/
+│   ├── sketch.ino
+│   ├── DistanceSensor.ino
+│   ├── BuzzerModule.ino
+│   ├── PixelsModule.ino
+│   └── ThermoModule.ino
+│
+├── python/
+│   └── main.py
+│
+└── app.yml
+```
+## 🎨 Color Palette
+
+| Color | Use | Value |
+|-------|-----|-------|
+| Orange | Primary (Buttons, Links) | #ff3e00 |
+| Yellow | Secondary (Gradients) | #ffaa00 |
+| Light Gray | Background | #f4f4f4 |
+| Dark Gray | Text | #272727 |
+
+## 🔄 Navigation Flow
+
+```
+Home (/)
+    ↓
+[Explore Map] [Learn More]
+    ↓                ↓
+  /map            /about
+  ├─ Header       ├─ Header
+  ├─ Menu ✓       ├─ Menu ✗
+  └─ MapLayout    └─ Information
+
+From /map:
+  ↓ (Menu Button)
+[Sidebar] - 25% width
+  - Settings
+  - Documentation
+  - Support
+  - Contact
+```
+
+## ✨ Notable Features
+
+✅ **SEO Optimized** - Meta tags and titles on each page
+✅ **Responsive** - Works on all devices
+✅ **Smooth Transitions** - Fade animations between pages
+✅ **Conditional Menu** - Only visible where appropriate
+✅ **Sticky Header** - Adapts to scrolling
+✅ **Interactivity** - Hover effects and animations
+
+## 📝 Upcoming Improvements
+
+- [ ] Integrate real map (Leaflet/Mapbox)
+- [ ] Websocket for live data
+- [ ] Statistics dashboard
+- [ ] Authentication system
+- [ ] Product gallery
+- [ ] 3D helmet animation
+
+## 🤝 Contributors
+
+- Interhack 2026 Team
+- Qualcomm Innovation Challenge
+
+---
+
+**Last updated**: May 10, 2026
+
+
+Evolution:
+
+The next stages of the product will focus mainly on scalability and the incorporation of infrared light systems to improve illumination or even allow nighttime circulation.
+
+
+**SOFTWARE**
+
+**AI Training**
+
+For real-time collision detection with low latency, we have implemented a TinyML model using the Edge Impulse platform. This allows us to perform Edge Computing. Image processing is done locally on the device without needing to rely on the cloud, leveraging a local model.
+
+Training Process:
+- Data Acquisition: Creation of a custom dataset with more than 100 captures of rubber ducks, taken with the *Logitech Brio 105 Business Webcam* at different angles. Considering factors such as distances and lighting conditions to simulate varied obstacles.
+- Impulse Design: Image pre-processing to optimize memory consumption.
+- Feature extraction through image processing blocks.
+- Detection Model: Training of a neural network optimized for mobile devices (Object Detection).
+- Optimization: Conversion of the model to a lightweight format (TensorFlow Lite equivalent) to run on a high-performance, low-power chip.
+- Local Implementation (On-Device AI): Unlike other systems that send video to a server, our AI runs directly on a dedicated microchip integrated into the helmet.
+
+Model characteristics
+- Minimum latency: The alert is instantaneous (critical to avoid collisions).
+- Privacy: No images of public roads are stored or sent; the system only generates alerts and anonymous numerical data.
+
+- Model Result. Since our product requires measuring distances to objects, we will use the ratio of the object's size relative to the full image as a reference. Since this ratio must vary in proportion to the distance, the training data available to us (oriented to work with centroids) is inefficient and therefore the model has not given us the desired results.
+
+As a consequence, we used a pre-trained model provided by Qualcomm Innovation Challenge to carry out our demo.
+
+
+## Hardware
+
+This prototype incorporates multiple hardware sensors that allow us to test the real latency of the different inputs of our design.
+
+### Main Components
+| Module | Units | Description | Reference |
+|-------|---------|------------|------------|
+| [Arduino Modulino Vibro] | 1 | Sensor to alert the user with vibration | (https://docs.arduino.cc/hardware/modulino-vibro/)|
+| [Arduino Modulino Pixels] | 1 | Customizable display | (https://docs.arduino.cc/hardware/modulino-pixels/)|
+| [Arduino Modulino Thermo] | 1 | Ambient temperature sensor | (https://docs.arduino.cc/hardware/modulino-thermo/)|
+| [Arduino Modulino Distance] | 1 | Sensor that detects the distance of a hazard | (https://docs.arduino.cc/hardware/modulino-distance/)|
+| [Arduino Modulino Buzzer] | 1 | Sound alert for the user | (https://docs.arduino.cc/hardware/modulino-buzzer/)|
+| [Arduino Modulino Movement] | 1 | Accelerometer for decision making | (https://docs.arduino.cc/hardware/modulino-movement/)|
+
+
+**FUTURE PERSPECTIVE**
+
+To transform this prototype into a market product, our roadmap includes:
+1. High Performance AI and 360° Vision:
+- Multi-object Recognition: Training the model to identify vehicles, pedestrians, traffic signs and animals with a near-zero error rate.
+- Night Vision: Implementation of infrared sensors to maintain safety during night driving or in tunnels.
+
+2. Advanced Environmental Monitoring
+- Air Quality Sensors (NOx, PM2.5): Integration of specific sensors to measure suspended particles and nitrogen dioxide. This would allow the City Council to have a street-by-street pollution map in real time.
+- Asphalt Analysis: Using the accelerometer to automatically detect potholes or irregularities in the road surface and report them directly to urban maintenance services.
+
+3. Connectivity and Ecosystem
+- V2X (Vehicle-to-Everything): Direct connection with traffic lights and other vehicles to anticipate collisions before the object is visible to the camera.
+- User App: A mobile device-compatible interface where the cyclist can check their safety statistics and receive rewards for the environmental data contributed.Autors: Natàlia Cortés, Joan Marc Samó, Carolina Espin, Josep Mª Cases, Carlos Albaladejo
+
+CATALAN
 
 # SafeHelmet - Sistema de Detecció de Col·lisions
 
@@ -240,246 +513,3 @@ Per transformar aquest prototip en un producte de mercat, el nostre full de ruta
 3. Connectivitat i Ecosistema
 - V2X (Vehicle-to-Everything): Connexió directa amb els semàfors i altres vehicles per preveure col·lisions abans que l'objecte sigui visible per la càmera.
 - App per a l'Usuari: Una interfície compatible amb dispositius mòbils on el ciclista pugui consultar les seves estadístiques de seguretat i rebre recompenses per les dades ambientals aportades.
-
----
-
-ENGLISH
-
-Authors: Natàlia Cortés, Joan Marc Samó, Carolina Espin, Josep Mª Cases, Carlos Albaladejo
-
-# SafeHelmet - Collision Detection System
-
-**Project Name**: SafeHelmet
-
-## 🎯 Project Objectives
-
-- Develop a collision detection and alert system for static and dynamic objects, integrated into certified protective helmets as an accessory tool for road circulation
-- Detect moving objects simulating the reality of the road network
-- Address the risk posed by excessive speed and proximity of objects
-
-## 🏗️ Web Architecture
-
-The web interface has been primarily structured with:
-
-### Pages and Routes (SEO Optimized)
-- **`/`** - Home page with a product introduction
-- **`/map`** - Visualization of locations, incidents and other data
-- **`/camera`** - Live monitoring with active detection
-- **`/about`** - Information about the project and team
-
-### Main Components
-
-#### Enhanced Header
-- 3 columns: Map Button | Logo | About Us + Menu
-- Intuitive navigation
-- Sticky header on scroll
-
-#### Sidebar
-- Contextual menu (~25% width)
-- Only visible at `/map` and `/camera`
-- Smooth transitions
-- Overlay to close
-
-#### Modern Design
-- Color gradients (Orange #ff3e00 → Yellow #ffaa00)
-- Transitions and hover effects
-- Responsive design (Desktop, Tablet, Mobile)
-
-## 💻 Technologies Used
-
-### Frontend
-- **Svelte 5.55.2** - Reactive framework
-- **SvelteKit 2.57.0** - Full-stack framework with routing
-- **TypeScript 6.0.2** - Static typing
-- **Vite 8.0.7** - Fast build tool
-
-### Backend (Arduino)
-- **Python** - Main script
-- **Arduino IDE** - Hardware sketch
-- Collision detection via sensors
-
-## 🚨 Alert Systems
-
-### Visual Alert
-- Two hertz flashing
-- Non-saturated red LED
-- Located on the handlebar
-
-### Sound Alert and Vibration
-- System integrated into the helmet
-- Immediate proximity notification
-
-### Intelligent Detection
-- Distance identification with OpenCV (implementable)
-- Object speed analysis
-- Real-time system
-
-## 📁 Project Structure
-
-```
-Interhack-2026-Qualcom/
-├── src/
-│   ├── routes/                    # SvelteKit routes
-│   │   ├── +layout.svelte        # Main layout
-│   │   ├── +page.svelte          # Landing
-│   │   ├── map/+page.svelte      # Map
-│   │   ├── about/+page.svelte    # Information
-│   │   └── camera/+page.svelte   # Live monitoring
-│   ├── lib/
-│   │   ├── components/
-│   │   │   └── molecules/templates/
-│   │   │       ├── Header.svelte       # Enhanced header
-│   │   │       ├── Sidebar.svelte      # Side menu
-│   │   │       ├── About.svelte        # About page
-│   │   │       └── MapLayout.svelte    # Map layout
-│   │   └── styles/
-│   │       └── global.css              # Global styles
-│   └── static/icons/             # SVG icons
-├── Arduino code/
-│   ├── sketch/
-│   │   └── sketch.ino            # Arduino code
-│   └── python/
-│       └── main.py               # Python script
-├── package.json
-└── svelte.config.js
-
-```
-
-## 🚀 How to Run
-
-### Development
-```bash
-npm install      # Install dependencies
-npm run dev      # Start server (http://localhost:5173)
-```
-
-### Production Build
-```bash
-npm run build    # Create optimized build
-npm run preview  # Preview the build
-```
-
-### Validation
-```bash
-npm run check          # Svelte check
-npm run check:watch    # Check in watch mode
-```
-
-## 🎨 Color Palette
-
-| Color | Use | Value |
-|-------|-----|-------|
-| Orange | Primary (Buttons, Links) | #ff3e00 |
-| Yellow | Secondary (Gradients) | #ffaa00 |
-| Light Gray | Background | #f4f4f4 |
-| Dark Gray | Text | #272727 |
-
-## 🔄 Navigation Flow
-
-```
-Home (/)
-    ↓
-[Explore Map] [Learn More]
-    ↓                ↓
-  /map            /about
-  ├─ Header       ├─ Header
-  ├─ Menu ✓       ├─ Menu ✗
-  └─ MapLayout    └─ Information
-
-From /map:
-  ↓ (Menu Button)
-[Sidebar] - 25% width
-  - Settings
-  - Documentation
-  - Support
-  - Contact
-```
-
-## ✨ Notable Features
-
-✅ **SEO Optimized** - Meta tags and titles on each page
-✅ **Responsive** - Works on all devices
-✅ **Smooth Transitions** - Fade animations between pages
-✅ **Conditional Menu** - Only visible where appropriate
-✅ **Sticky Header** - Adapts to scrolling
-✅ **Interactivity** - Hover effects and animations
-
-## 📝 Upcoming Improvements
-
-- [ ] Integrate real map (Leaflet/Mapbox)
-- [ ] Websocket for live data
-- [ ] Statistics dashboard
-- [ ] Authentication system
-- [ ] Product gallery
-- [ ] 3D helmet animation
-
-## 🤝 Contributors
-
-- Interhack 2026 Team
-- Qualcomm Innovation Challenge
-
----
-
-**Last updated**: May 10, 2026
-
-
-Evolution:
-
-The next stages of the product will focus mainly on scalability and the incorporation of infrared light systems to improve illumination or even allow nighttime circulation.
-
-
-**SOFTWARE**
-
-**AI Training**
-
-For real-time collision detection with low latency, we have implemented a TinyML model using the Edge Impulse platform. This allows us to perform Edge Computing. Image processing is done locally on the device without needing to rely on the cloud, leveraging a local model.
-
-Training Process:
-- Data Acquisition: Creation of a custom dataset with more than 100 captures of rubber ducks, taken with the *Logitech Brio 105 Business Webcam* at different angles. Considering factors such as distances and lighting conditions to simulate varied obstacles.
-- Impulse Design: Image pre-processing to optimize memory consumption.
-- Feature extraction through image processing blocks.
-- Detection Model: Training of a neural network optimized for mobile devices (Object Detection).
-- Optimization: Conversion of the model to a lightweight format (TensorFlow Lite equivalent) to run on a high-performance, low-power chip.
-- Local Implementation (On-Device AI): Unlike other systems that send video to a server, our AI runs directly on a dedicated microchip integrated into the helmet.
-
-<img width="512" height="512" alt="unknown 6o3ec6b0 ingestion-774b75fcb-lgb7p" src="https://github.com/user-attachments/assets/01041111-9895-4563-ac2f-ebe2a6e025d6" /><img width="512" height="512" alt="unknown 6o3ed6v2 ingestion-774b75fcb-jwg66" src="https://github.com/user-attachments/assets/4cc178a2-95cd-4027-badc-b36ab2577336" />
-<img width="512" height="512" alt="unknown 6o3egrjb" src="https://github.com/user-attachments/assets/f84c1097-1ae6-47f5-82ed-4c7452dd2631" />
-
-Model characteristics
-- Minimum latency: The alert is instantaneous (critical to avoid collisions).
-- Privacy: No images of public roads are stored or sent; the system only generates alerts and anonymous numerical data.
-
-- Model Result. Since our product requires measuring distances to objects, we will use the ratio of the object's size relative to the full image as a reference. Since this ratio must vary in proportion to the distance, the training data available to us (oriented to work with centroids) is inefficient and therefore the model has not given us the desired results.
-
-As a consequence, we used a pre-trained model provided by Qualcomm Innovation Challenge to carry out our demo.
-
-
-## Hardware
-
-This prototype incorporates multiple hardware sensors that allow us to test the real latency of the different inputs of our design.
-
-### Main Components
-| Module | Units | Description | Reference |
-|-------|---------|------------|------------|
-| [Arduino Modulino Vibro] | 1 | Sensor to alert the user with vibration | (https://docs.arduino.cc/hardware/modulino-vibro/)|
-| [Arduino Modulino Pixels] | 1 | Customizable display | (https://docs.arduino.cc/hardware/modulino-pixels/)|
-| [Arduino Modulino Thermo] | 1 | Ambient temperature sensor | (https://docs.arduino.cc/hardware/modulino-thermo/)|
-| [Arduino Modulino Distance] | 1 | Sensor that detects the distance of a hazard | (https://docs.arduino.cc/hardware/modulino-distance/)|
-| [Arduino Modulino Buzzer] | 1 | Sound alert for the user | (https://docs.arduino.cc/hardware/modulino-buzzer/)|
-| [Arduino Modulino Movement] | 1 | Accelerometer for decision making | (https://docs.arduino.cc/hardware/modulino-movement/)|
-
-
-**FUTURE PERSPECTIVE**
-
-To transform this prototype into a market product, our roadmap includes:
-1. High Performance AI and 360° Vision:
-- Multi-object Recognition: Training the model to identify vehicles, pedestrians, traffic signs and animals with a near-zero error rate.
-- Night Vision: Implementation of infrared sensors to maintain safety during night driving or in tunnels.
-
-2. Advanced Environmental Monitoring
-- Air Quality Sensors (NOx, PM2.5): Integration of specific sensors to measure suspended particles and nitrogen dioxide. This would allow the City Council to have a street-by-street pollution map in real time.
-- Asphalt Analysis: Using the accelerometer to automatically detect potholes or irregularities in the road surface and report them directly to urban maintenance services.
-
-3. Connectivity and Ecosystem
-- V2X (Vehicle-to-Everything): Direct connection with traffic lights and other vehicles to anticipate collisions before the object is visible to the camera.
-- User App: A mobile device-compatible interface where the cyclist can check their safety statistics and receive rewards for the environmental data contributed.
