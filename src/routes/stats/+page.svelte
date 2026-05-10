@@ -21,7 +21,7 @@
   const MAX_POINTS = 100;
   const POLL_MS = 500;
   const CHART_WIDTH = 320;
-  const CHART_HEIGHT = 132;
+  const CHART_HEIGHT = 150;
   const CHART_PAD = 16;
 
   let sensorData = $state<SensorData | null>(null);
@@ -112,10 +112,6 @@
   const pm25Series = $derived(series((sample) => sample.data.environment?.pollution?.pm25_ug_m3));
   const pm10Series = $derived(series((sample) => sample.data.environment?.pollution?.pm10_ug_m3));
   const no2Series = $derived(series((sample) => sample.data.environment?.pollution?.no2_ug_m3));
-  const movementXSeries = $derived(series((sample) => sample.data.movement?.x));
-  const movementYSeries = $derived(series((sample) => sample.data.movement?.y));
-  const movementZSeries = $derived(series((sample) => sample.data.movement?.z));
-
   function numberOrNull(value: unknown) {
     return typeof value === 'number' && Number.isFinite(value) ? value : null;
   }
@@ -167,6 +163,21 @@
         return `${index === 0 ? 'M' : 'L'} ${x.toFixed(1)} ${y.toFixed(1)}`;
       })
       .join(' ');
+  }
+
+  function areaPath(points: SeriesPoint[], groups: SeriesPoint[][] = [points]) {
+    const path = linePath(points, groups);
+    if (!path || points.length < 2) return '';
+
+    const { min, max } = bounds(groups);
+    const maxX = Math.max(1, history.length - 1);
+    const first = points[0];
+    const last = points[points.length - 1];
+    const firstX = CHART_PAD + (first.x / maxX) * (CHART_WIDTH - CHART_PAD * 2);
+    const lastX = CHART_PAD + (last.x / maxX) * (CHART_WIDTH - CHART_PAD * 2);
+    const baseline = CHART_HEIGHT - CHART_PAD - ((min - min) / (max - min)) * (CHART_HEIGHT - CHART_PAD * 2);
+
+    return `${path} L ${lastX.toFixed(1)} ${baseline.toFixed(1)} L ${firstX.toFixed(1)} ${baseline.toFixed(1)} Z`;
   }
 
   function lastPoint(points: SeriesPoint[], groups: SeriesPoint[][] = [points]) {
@@ -226,7 +237,7 @@
     <header class="stats-header">
       <div>
         <span class="eyebrow">SafeHelmet</span>
-        <h1>Stats</h1>
+        <h1>Estadistiques</h1>
       </div>
 
       <div class="status-stack">
@@ -252,18 +263,21 @@
       <article class="chart-panel wide">
         <div class="panel-header">
           <div>
-            <span>Proximitat</span>
-            <h2>Distancia posterior</h2>
+            <span>Seguretat</span>
+            <h2>Distancia de frenada</h2>
           </div>
           <strong class={zoneClass(sensorData?.status?.zone)}>{formatValue(sensorData?.distance_mm, ' mm')}</strong>
         </div>
 
         <svg viewBox="0 0 {CHART_WIDTH} {CHART_HEIGHT}" role="img" aria-label="Historic de distancia">
-          <path class="grid-line" d="M 16 30 H 304 M 16 66 H 304 M 16 102 H 304" />
+          <path class="grid-line" d="M 16 34 H 304 M 16 75 H 304 M 16 116 H 304" />
+          <path class="area distance-area" d={areaPath(distanceSeries)} />
           <path class="series distance" d={linePath(distanceSeries)} />
           {#if lastPoint(distanceSeries)}
             {@const point = lastPoint(distanceSeries)}
             <circle class="dot distance" cx={point?.x} cy={point?.y} r="4" />
+          {:else}
+            <text class="empty-label" x="160" y="80">Esperant dades</text>
           {/if}
         </svg>
       </article>
@@ -271,15 +285,18 @@
       <article class="chart-panel">
         <div class="panel-header">
           <div>
-            <span>Ambient</span>
-            <h2>Temperatura i humitat</h2>
+            <span>Confort</span>
+            <h2>Temperatura / humitat</h2>
           </div>
         </div>
 
         <svg viewBox="0 0 {CHART_WIDTH} {CHART_HEIGHT}" role="img" aria-label="Historic de temperatura i humitat">
-          <path class="grid-line" d="M 16 30 H 304 M 16 66 H 304 M 16 102 H 304" />
+          <path class="grid-line" d="M 16 34 H 304 M 16 75 H 304 M 16 116 H 304" />
           <path class="series temperature" d={linePath(temperatureSeries, [temperatureSeries, humiditySeries])} />
           <path class="series humidity" d={linePath(humiditySeries, [temperatureSeries, humiditySeries])} />
+          {#if temperatureSeries.length < 2 && humiditySeries.length < 2}
+            <text class="empty-label" x="160" y="80">Esperant dades</text>
+          {/if}
         </svg>
 
         <div class="legend">
@@ -291,55 +308,39 @@
       <article class="chart-panel">
         <div class="panel-header">
           <div>
-            <span>Accelerometre</span>
-            <h2>Moviment x/y/z</h2>
-          </div>
-          <strong>{sensorData?.status?.moving ? 'Movent-se' : 'Quiet'}</strong>
-        </div>
-
-        <svg viewBox="0 0 {CHART_WIDTH} {CHART_HEIGHT}" role="img" aria-label="Historic de moviment">
-          <path class="grid-line" d="M 16 30 H 304 M 16 66 H 304 M 16 102 H 304" />
-          <path class="series axis-x" d={linePath(movementXSeries, [movementXSeries, movementYSeries, movementZSeries])} />
-          <path class="series axis-y" d={linePath(movementYSeries, [movementXSeries, movementYSeries, movementZSeries])} />
-          <path class="series axis-z" d={linePath(movementZSeries, [movementXSeries, movementYSeries, movementZSeries])} />
-        </svg>
-
-        <div class="legend">
-          <span><i class="axis-x"></i>X</span>
-          <span><i class="axis-y"></i>Y</span>
-          <span><i class="axis-z"></i>Z</span>
-        </div>
-      </article>
-
-      <article class="chart-panel">
-        <div class="panel-header">
-          <div>
-            <span>Soroll</span>
-            <h2>dB(A)</h2>
+            <span>Entorn</span>
+            <h2>Soroll ambiental</h2>
           </div>
           <strong class={zoneClass(sensorData?.environment?.noise?.zone)}>{formatValue(sensorData?.environment?.noise?.db_a, ' dB')}</strong>
         </div>
 
         <svg viewBox="0 0 {CHART_WIDTH} {CHART_HEIGHT}" role="img" aria-label="Historic de soroll">
-          <path class="grid-line" d="M 16 30 H 304 M 16 66 H 304 M 16 102 H 304" />
+          <path class="grid-line" d="M 16 34 H 304 M 16 75 H 304 M 16 116 H 304" />
+          <path class="area noise-area" d={areaPath(noiseSeries)} />
           <path class="series noise" d={linePath(noiseSeries)} />
+          {#if noiseSeries.length < 2}
+            <text class="empty-label" x="160" y="80">Esperant dades</text>
+          {/if}
         </svg>
       </article>
 
       <article class="chart-panel">
         <div class="panel-header">
           <div>
-            <span>Qualitat aire</span>
+            <span>Aire</span>
             <h2>Particules i NO2</h2>
           </div>
           <strong class={zoneClass(sensorData?.environment?.pollution?.zone)}>{sensorData?.environment?.pollution?.zone ?? '--'}</strong>
         </div>
 
         <svg viewBox="0 0 {CHART_WIDTH} {CHART_HEIGHT}" role="img" aria-label="Historic de contaminacio">
-          <path class="grid-line" d="M 16 30 H 304 M 16 66 H 304 M 16 102 H 304" />
+          <path class="grid-line" d="M 16 34 H 304 M 16 75 H 304 M 16 116 H 304" />
           <path class="series pm25" d={linePath(pm25Series, [pm25Series, pm10Series, no2Series])} />
           <path class="series pm10" d={linePath(pm10Series, [pm25Series, pm10Series, no2Series])} />
           <path class="series no2" d={linePath(no2Series, [pm25Series, pm10Series, no2Series])} />
+          {#if pm25Series.length < 2 && pm10Series.length < 2 && no2Series.length < 2}
+            <text class="empty-label" x="160" y="80">Esperant dades</text>
+          {/if}
         </svg>
 
         <div class="legend">
@@ -349,11 +350,11 @@
         </div>
       </article>
 
-      <article class="chart-panel wide">
+      <article class="chart-panel limit-panel">
         <div class="panel-header">
           <div>
-            <span>Limits OMS</span>
-            <h2>Valor actual vs limit</h2>
+            <span>Llindars OMS</span>
+            <h2>Comparativa actual</h2>
           </div>
         </div>
 
@@ -364,16 +365,16 @@
             <span>2x</span>
           </div>
 
-          <svg viewBox="0 0 286 180" role="img" aria-label="Comparativa de limits OMS">
-            <path class="limit-guide" d="M 116 10 V 170 M 216 10 V 170" />
+          <svg viewBox="0 0 286 150" role="img" aria-label="Comparativa de limits OMS">
+            <path class="limit-guide" d="M 116 8 V 136 M 216 8 V 136" />
             {#each limitItems as item, index}
               {@const itemRatio = ratio(item.value, item.limit)}
-              {@const y = 28 + index * 40}
+              {@const y = 24 + index * 32}
               <line class="limit-row" x1="16" x2="270" y1={y} y2={y} />
-              <circle class={zoneClass(item.zone)} cx="116" cy={y} r="8" />
-              <circle class={zoneClass(item.zone)} cx={limitX(item.value, item.limit)} cy={y} r="10" />
-              <text x="18" y={y - 13}>{item.label}</text>
-              <text x="134" y={y + 5}>{itemRatio === null ? '--' : `${itemRatio.toFixed(1)}x`}</text>
+              <circle class="limit-dot" cx="116" cy={y} r="5" />
+              <circle class={zoneClass(item.zone)} cx={limitX(item.value, item.limit)} cy={y} r="7" />
+              <text x="18" y={y - 10}>{item.label}</text>
+              <text x="130" y={y + 4}>{itemRatio === null ? '--' : `${itemRatio.toFixed(1)}x`}</text>
             {/each}
           </svg>
         </div>
@@ -495,12 +496,16 @@
   }
 
   .chart-panel {
-    min-height: 258px;
+    min-height: 244px;
     padding: 14px;
   }
 
   .chart-panel.wide {
     grid-column: span 2;
+  }
+
+  .limit-panel {
+    min-height: 214px;
   }
 
   .panel-header {
@@ -528,15 +533,20 @@
   .grid-line,
   .limit-guide {
     fill: none;
-    stroke: rgba(39, 39, 39, 0.1);
+    stroke: rgba(39, 39, 39, 0.08);
     stroke-width: 1;
   }
 
   .series {
     fill: none;
-    stroke-width: 3;
+    stroke-width: 2.5;
     stroke-linecap: round;
     stroke-linejoin: round;
+  }
+
+  .area {
+    opacity: 0.12;
+    stroke: none;
   }
 
   .dot {
@@ -544,33 +554,43 @@
     stroke-width: 2;
   }
 
-  .distance,
-  .noise {
+  .series.distance,
+  .series.noise {
     stroke: var(--primary-color);
+  }
+
+  .distance-area,
+  .noise-area,
+  .dot.distance {
     fill: var(--primary-color);
   }
 
-  .temperature,
-  .axis-x,
-  .pm25 {
+  .series.temperature,
+  .series.pm25 {
     stroke: var(--first-color);
+  }
+
+  .legend i.temperature,
+  .legend i.pm25 {
     background: var(--first-color);
-    fill: var(--first-color);
   }
 
-  .humidity,
-  .axis-y,
-  .pm10 {
+  .series.humidity,
+  .series.pm10 {
     stroke: var(--third-color);
-    background: var(--third-color);
-    fill: var(--third-color);
   }
 
-  .axis-z,
-  .no2 {
+  .legend i.humidity,
+  .legend i.pm10 {
+    background: var(--third-color);
+  }
+
+  .series.no2 {
     stroke: var(--second-color);
+  }
+
+  .legend i.no2 {
     background: var(--second-color);
-    fill: var(--second-color);
   }
 
   .legend {
@@ -597,31 +617,41 @@
 
   .limit-chart {
     display: grid;
-    grid-template-columns: 54px 1fr;
+    grid-template-columns: 42px 1fr;
     align-items: stretch;
-    gap: 10px;
+    gap: 8px;
   }
 
   .limit-axis {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    padding: 12px 0;
+    padding: 10px 0 12px;
     color: var(--grey-color);
-    font-size: 0.78rem;
+    font-size: 0.72rem;
     font-weight: 800;
   }
 
   .limit-row {
-    stroke: rgba(39, 39, 39, 0.06);
-    stroke-width: 14;
+    stroke: rgba(39, 39, 39, 0.055);
+    stroke-width: 10;
     stroke-linecap: round;
+  }
+
+  .limit-dot {
+    fill: rgba(39, 39, 39, 0.22);
   }
 
   text {
     fill: #888;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 800;
+  }
+
+  .empty-label {
+    fill: rgba(136, 136, 136, 0.75);
+    font-size: 13px;
+    text-anchor: middle;
   }
 
   :global(.zone-ok),
