@@ -21,7 +21,7 @@
     } 
   };
 
-  function navigateTo(path) { 
+  function navigateTo(path: string) {
     goto(path);
   };
 
@@ -36,14 +36,17 @@
 
 <header class:sticky={isScrolled}>
   <div class="nav-section">
-    <button class="brand-btn" onclick={() => navigateTo('/about')} title="Sobre nosotros">
-      SafeHelmet
+    <button class="brand-btn" onclick={() => navigateTo('/about')} title="Sobre nosaltres">
+      <img src="/icons/logo.png" alt="Logo SafeHelmet" aria-label="duck-logo" />SafeHelmet
     </button>
     <button class="nav-btn" onclick={() => navigateTo('/map')} title="Ir a mapa">
       <img src="/icons/map-relief.svg" alt="Mapa" />
     </button>
     <button class="nav-btn" onclick={() => navigateTo('/camera')} title="Ir a Cámara">
       <img src="/icons/camera.svg" alt="Cámara" />
+    </button>
+    <button class="nav-btn" onclick={() => navigateTo('/stats')} title="Ir a estadisticas">
+      <img src="/icons/stats.svg" alt="Estadisticas" />
     </button>
   </div>
 
@@ -67,16 +70,15 @@
     z-index: 100;
     transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
     margin: 0.9rem 1.5rem 0;
-    border: 1px solid rgba(242, 204, 143, 0.28);
     border-radius: 8px;
-    background: rgba(244, 244, 240, 0.52);
+    background: var(--bg-color);
     backdrop-filter: blur(16px);
     box-shadow: 0 12px 36px rgba(39, 39, 39, 0.06);
   }
 
   header.sticky {
     padding: 0.75rem 2rem;
-    background: rgba(244, 244, 240, 0.66);
+    background: var(--bg-color);
   }
 
   .nav-section {
@@ -92,8 +94,7 @@
 
   .brand-btn,
   .nav-btn,
-  .menu-btn, 
-  .nav-text {
+  .menu-btn {
     background: none;
     border: none;
     cursor: pointer;
@@ -140,17 +141,6 @@
     transform: scale(1.1);
   }
 
-  .nav-text {
-    font-size: 0.9rem;
-    font-weight: 500;
-    color: #333;
-    letter-spacing: 0.5px;
-  }
-
-  .nav-text:hover {
-    color: var(--second-color);
-  }
-
   .menu-btn {
     width: 40px;
     height: 40px;
@@ -165,6 +155,12 @@
 
   .menu-btn:hover img {
     transform: scale(1.1);
+  }
+
+  img {
+    height: 40px;
+    width: 70px;
+    object-fit: cover; 
   }
   @media (max-width: 768px) {
     header {

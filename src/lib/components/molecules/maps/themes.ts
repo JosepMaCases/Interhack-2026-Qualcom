@@ -51,7 +51,7 @@ export const THEMES: Record<string, MapTheme> = {
     'CATALONIA_3D_WHITE': {
         id: 'globe-3d-white',
         center: [2.185, 41.403],
-        zoom:11.5,
+        zoom:13.5,
         mobileZoom: 1,
         minZoom: 0,
         maxPitch: 80,
@@ -62,10 +62,10 @@ export const THEMES: Record<string, MapTheme> = {
             boundariesADM0: '#a46347',
             boundariesWidthLine: .6, 
             textureOpacity: 0.6,
-            roads: '#a09f9fff',
+            roads: 'rgb(216, 216, 216)',
             roadsLineWidth: 2,
             roadsOpacity: 1,
-            buildings: '#9b9b9bff',
+            buildings: 'rgb(206, 206, 206)',
             text: '#000000ff'
         },
             text: {
@@ -78,8 +78,8 @@ export const THEMES: Record<string, MapTheme> = {
             showTerrain: true,
             showRoads: true,
             showStreetNames:true,
-            showBuildings: true,
-            showBuildings3D: true,
+            showBuildings: false,
+            showBuildings3D: false,
             showCountriesNames: true,
             showBoundariesADM0: true,
             texture:'world_dem_clipped.pmtiles', // nom del fitxer pmtiles
