@@ -18,12 +18,14 @@
         console.error("Error de connexió amb els sensors:", error);
       }
     };
+  
 
     // Fem una primera crida immediata en carregar el component
     fetchSensors();
 
     // Configurem el polling: truca a l'API cada 500 mil·lisegons (mig segon)
-    intervalId = setInterval(fetchSensors, 500); 
+    intervalId = setInterval(fetchSensors, 500);
+    console.log(sensorData)
   });
 
   onDestroy(() => {
@@ -47,11 +49,9 @@
       alt="Vídeo en directe" 
     />
 
-    <div class="scanner-line"></div>
-
     <div class="sensor-overlay">
       {#if sensorData}
-        <pre>{JSON.stringify(sensorData, null, 2)}</pre>
+        <pre>{console.log(JSON.stringify(sensorData, null, 2))}</pre>
       {/if}
     </div>
 
@@ -77,10 +77,14 @@
 
   .scanner-line {
     width: 100%;
-    height: 2px;
+    height: px;
     background: rgba(0, 255, 0, 0.5);
     position: absolute;
     animation: scan 3s infinite linear;
+  }
+  .camera-stream {
+    width: 100%;
+    height: 100%;
   }
 
   @keyframes scan {

@@ -37,7 +37,7 @@
 <header class:sticky={isScrolled}>
   <div class="nav-section">
     <button class="nav-btn" onclick={() => navigateTo('/about')} title="Sobre nosotros">
-      <span class="nav-text">SafeHelmet</span>
+      SafeHelmet
     </button>
     <button class="nav-btn" onclick={() => navigateTo('/map')} title="Ir a mapa">
       <img src="/icons/map-relief.svg" alt="Mapa" />
