@@ -17,9 +17,10 @@ logger = Logger("helmet-api")
 ui = WebUI(addr="0.0.0.0", port=7000, cors_origins="")
 detection_stream = VideoObjectDetection(
     confidence=0.5,
-    debounce_sec=0.0,
+    debounce_sec=0.3,
     camera_preview=True,
 )
+ui.on_message("override_th", lambda sid, threshold: detection_stream.override_threshold(threshold))
 
 latest_sensors = {
     "distance_mm": None,
@@ -45,6 +46,13 @@ latest_sensors = {
             "ratio": 0.0,
             "label": None,
             "zone": "NO_OBJECT",
+        },
+        "face_proximity": {
+            "detected": False,
+            "ratio": 0.0,
+            "color": "green",
+            "label": "NO_FACE - sin cara",
+            "updated_at": None,
         },
         "updated_at": None,
     },
@@ -73,6 +81,7 @@ latest_sensors = {
 }
 last_detection_seen_ts = 0
 latest_detections = []
+last_face_proximity_state = None
 last_environment_update_ts = 0
 traffic_episode_until_ts = 0
 environment_state = {
@@ -107,6 +116,12 @@ PROXIMITY_ZONES = {
     2: "DANGER",
     3: "CRITICAL",
 }
+FACE_PROXIMITY_X = 0.5
+FACE_PROXIMITY_LEVELS = [
+    (FACE_PROXIMITY_X, "red", "DANGER - muy cerca"),
+    (FACE_PROXIMITY_X / 2, "orange", "WARNING - cerca"),
+    (FACE_PROXIMITY_X / 8, "green", "SAFE - lejos"),
+]
 API_HEADERS = {
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Methods": "GET, OPTIONS",
@@ -184,11 +199,122 @@ def record_status(moving: int, distance_mm: int, zone_code: int):
     print(f"Estat: {movement_state} | Distancia: {distance_mm} mm | Zona: {zone}")
 
 
+def default_face_proximity():
+    return {
+        "detected": False,
+        "ratio": 0.0,
+        "color": "green",
+        "label": "NO_FACE - sin cara",
+        "updated_at": None,
+    }
+
+
+def face_detected():
+    pass
+
+
+def send_detections_to_ui(detections: dict):
+    for key, values in detections.items():
+        for value in values:
+            entry = {
+                "content": str(key),
+                "confidence": value.get("confidence"),
+                "timestamp": now_iso(),
+            }
+            ui.send_message("detection", message=entry)
+
+
+def normalize_area_ratio(width: float, height: float, image_width=96, image_height=96):
+    width = float(width or 0.0)
+    height = float(height or 0.0)
+
+    if width <= 0.0 or height <= 0.0:
+        return 0.0
+
+    area = width * height
+    if width > 1.0 or height > 1.0:
+        image_area = image_width * image_height
+        return area / image_area if image_area > 0 else 0.0
+
+    return area
+
+
+def face_box_area_ratio(value: dict):
+    bbox = value.get("bbox") or value.get("box") or {}
+
+    width = bbox.get("w") or bbox.get("width") or value.get("w") or value.get("width")
+    height = bbox.get("h") or bbox.get("height") or value.get("h") or value.get("height")
+
+    if width and height:
+        return normalize_area_ratio(width, height)
+
+    box = value.get("bounding_box_xyxy")
+    if box and len(box) == 4:
+        x1, y1, x2, y2 = [float(item) for item in box]
+        return normalize_area_ratio(max(0.0, x2 - x1), max(0.0, y2 - y1))
+
+    return 0.0
+
+
+def face_proximity_color(ratio: float):
+    for threshold, color, label in FACE_PROXIMITY_LEVELS:
+        if ratio >= threshold:
+            return color, label
+
+    return "green", "SAFE - lejos"
+
+
+def update_face_proximity(detections: dict):
+    global last_face_proximity_state
+
+    faces = detections.get("face", [])
+    if not faces:
+        latest_sensors["object_detection"]["face_proximity"] = default_face_proximity()
+
+        if last_face_proximity_state is not None:
+            last_face_proximity_state = None
+            ui.send_message(
+                "detection",
+                message={
+                    "content": "PROXIMITY: sin cara",
+                    "confidence": 0.0,
+                    "timestamp": now_iso(),
+                },
+            )
+        return
+
+    best = max(faces, key=face_box_area_ratio)
+    ratio = face_box_area_ratio(best)
+    color, label = face_proximity_color(ratio)
+
+    latest_sensors["object_detection"]["face_proximity"] = {
+        "detected": True,
+        "ratio": round(ratio, 4),
+        "color": color,
+        "label": label,
+        "updated_at": now_iso(),
+    }
+
+    if label != last_face_proximity_state:
+        last_face_proximity_state = label
+        message = {
+            "content": f"PROXIMITY: {label}",
+            "confidence": round(ratio, 4),
+            "timestamp": now_iso(),
+        }
+        ui.send_message("feedback", message=message)
+        ui.send_message("detection", message=message)
+
+
 def record_detections(detections: dict):
     global last_detection_seen_ts, latest_detections
 
     detected_objects = []
     labels = []
+    face_proximity = latest_sensors["object_detection"].get(
+        "face_proximity",
+        default_face_proximity(),
+    )
 
     for label, values in detections.items():
         label = str(label)
@@ -218,6 +344,7 @@ def record_detections(detections: dict):
         "labels": sorted(set(labels)),
         "detections": detected_objects,
         "proximity": proximity,
+        "face_proximity": face_proximity,
         "updated_at": now_iso(),
     }
 
@@ -226,6 +353,12 @@ def record_detections(detections: dict):
         last_detection_seen_ts = time.time()
     else:
         latest_detections = []
+
+
+def handle_all_detections(detections: dict):
+    record_detections(detections)
+    send_detections_to_ui(detections)
+    update_face_proximity(detections)
 
 
 def current_camera_frame():
@@ -509,7 +642,7 @@ def get_camera():
 
 
 def get_sensors():
-    global latest_detections
+    global latest_detections, last_face_proximity_state
 
     update_environment()
 
@@ -524,7 +657,9 @@ def get_sensors():
             "label": None,
             "zone": PROXIMITY_ZONES[-1],
         }
+        latest_sensors["object_detection"]["face_proximity"] = default_face_proximity()
         latest_detections = []
+        last_face_proximity_state = None
 
     return JSONResponse(content=latest_sensors, headers=API_HEADERS)
 
@@ -542,7 +677,8 @@ try:
 except RuntimeError:
     logger.debug("Bridge handlers already registered")
 
-detection_stream.on_detect_all(record_detections)
+detection_stream.on_detect("face", face_detected)
+detection_stream.on_detect_all(handle_all_detections)
 
 ui.expose_api("GET", "/cam", get_camera)
 ui.expose_api("OPTIONS", "/cam", api_options)
