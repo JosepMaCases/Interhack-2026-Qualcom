@@ -4,13 +4,6 @@
 
   type Sample = { ts: number; data: SensorData };
   type SeriesPoint = { x: number; y: number };
-  type Metric = {
-    label: string;
-    value: number | null | undefined;
-    suffix: string;
-    zone?: string | null;
-    detail: string;
-  };
   type LimitItem = {
     label: string;
     value: number | null | undefined;
@@ -30,53 +23,9 @@
   let intervalId: ReturnType<typeof setInterval>;
 
   const latestZone = $derived(sensorData?.environment?.overall_zone ?? sensorData?.status?.zone ?? 'UNKNOWN');
-
-  const metrics = $derived<Metric[]>([
-    {
-      label: 'Distancia',
-      value: sensorData?.distance_mm,
-      suffix: ' mm',
-      zone: sensorData?.status?.zone,
-      detail: 'Proximitat posterior'
-    },
-    { label: 'Temperatura', value: sensorData?.temperature_c, suffix: ' C', detail: 'Ambient casc' },
-    { label: 'Humitat', value: sensorData?.humidity_percent, suffix: ' %', detail: 'Ambient casc' },
-    {
-      label: 'Soroll',
-      value: sensorData?.environment?.noise?.db_a,
-      suffix: ' dB',
-      zone: sensorData?.environment?.noise?.zone,
-      detail: `Limit ${formatValue(sensorData?.environment?.noise?.who_limit_db_a, ' dB')}`
-    },
-    {
-      label: 'PM2.5',
-      value: sensorData?.environment?.pollution?.pm25_ug_m3,
-      suffix: ' ug/m3',
-      zone: sensorData?.environment?.pollution?.zone,
-      detail: `Limit ${formatValue(sensorData?.environment?.pollution?.who_limits?.pm25_ug_m3, ' ug/m3')}`
-    },
-    {
-      label: 'PM10',
-      value: sensorData?.environment?.pollution?.pm10_ug_m3,
-      suffix: ' ug/m3',
-      zone: sensorData?.environment?.pollution?.zone,
-      detail: `Limit ${formatValue(sensorData?.environment?.pollution?.who_limits?.pm10_ug_m3, ' ug/m3')}`
-    },
-    {
-      label: 'NO2',
-      value: sensorData?.environment?.pollution?.no2_ug_m3,
-      suffix: ' ug/m3',
-      zone: sensorData?.environment?.pollution?.zone,
-      detail: `Limit ${formatValue(sensorData?.environment?.pollution?.who_limits?.no2_ug_m3, ' ug/m3')}`
-    },
-    {
-      label: 'Objectes',
-      value: sensorData?.object_detection?.count ?? 0,
-      suffix: '',
-      zone: sensorData?.object_detection?.proximity?.zone,
-      detail: sensorData?.object_detection?.labels?.join(', ') || 'Cap deteccio'
-    }
-  ]);
+  const proximityRatio = $derived(sensorData?.object_detection?.proximity?.ratio);
+  const proximityLabel = $derived(sensorData?.object_detection?.proximity?.label ?? sensorData?.object_detection?.proximity?.zone ?? 'Sense objecte');
+  const objectLabels = $derived(sensorData?.object_detection?.labels?.join(', ') || 'Cap deteccio');
 
   const limitItems = $derived<LimitItem[]>([
     {
@@ -108,7 +57,7 @@
   const distanceSeries = $derived(series((sample) => sample.data.distance_mm));
   const temperatureSeries = $derived(series((sample) => sample.data.temperature_c));
   const humiditySeries = $derived(series((sample) => sample.data.humidity_percent));
-  const noiseSeries = $derived(series((sample) => sample.data.environment?.noise?.db_a));
+  const detectionSeries = $derived(series((sample) => sample.data.object_detection?.count));
   const pm25Series = $derived(series((sample) => sample.data.environment?.pollution?.pm25_ug_m3));
   const pm10Series = $derived(series((sample) => sample.data.environment?.pollution?.pm10_ug_m3));
   const no2Series = $derived(series((sample) => sample.data.environment?.pollution?.no2_ug_m3));
@@ -249,22 +198,76 @@
       </div>
     </header>
 
-    <div class="metrics-grid">
-      {#each metrics as metric}
-        <article class="metric-card">
-          <span>{metric.label}</span>
-          <strong class={zoneClass(metric.zone)}>{formatValue(metric.value, metric.suffix)}</strong>
-          <small>{metric.detail}</small>
-        </article>
-      {/each}
+    <div class="risk-grid">
+      <article class="risk-card">
+        <span>Risc actual</span>
+        <strong class={zoneClass(latestZone)}>{latestZone}</strong>
+        <small>{connectionError ? 'Sense connexio amb el casc' : `Ultima lectura ${formatTime(sensorData?.updated_at)}`}</small>
+      </article>
+
+      <article class="risk-card">
+        <span>Proximitat</span>
+        <strong class={zoneClass(sensorData?.status?.zone)}>{formatValue(sensorData?.distance_mm, ' mm')}</strong>
+        <small>{proximityLabel}{numberOrNull(proximityRatio) === null ? '' : ` · ${(Number(proximityRatio) * 100).toFixed(0)}%`}</small>
+      </article>
+
+      <article class="risk-card">
+        <span>Objectes</span>
+        <strong class={zoneClass(sensorData?.object_detection?.proximity?.zone)}>{sensorData?.object_detection?.count ?? 0}</strong>
+        <small>{objectLabels}</small>
+      </article>
+
+      <article class="risk-card compact">
+        <span>Moviment</span>
+        <strong>{sensorData?.status?.moving ? 'En moviment' : 'Quiet'}</strong>
+        <small>{formatValue(sensorData?.movement?.x)} / {formatValue(sensorData?.movement?.y)} / {formatValue(sensorData?.movement?.z)}</small>
+      </article>
     </div>
 
     <div class="charts-grid">
-      <article class="chart-panel wide">
+      <article class="chart-panel">
+        <div class="panel-header">
+          <div>
+            <span>Casc</span>
+            <h2>Temperatura</h2>
+          </div>
+          <strong>{formatValue(sensorData?.temperature_c, ' C')}</strong>
+        </div>
+
+        <svg viewBox="0 0 {CHART_WIDTH} {CHART_HEIGHT}" role="img" aria-label="Historic de temperatura">
+          <path class="grid-line" d="M 16 34 H 304 M 16 75 H 304 M 16 116 H 304" />
+          <path class="area temperature-area" d={areaPath(temperatureSeries)} />
+          <path class="series temperature" d={linePath(temperatureSeries)} />
+          {#if temperatureSeries.length < 2}
+            <text class="empty-label" x="160" y="80">Esperant dades</text>
+          {/if}
+        </svg>
+      </article>
+
+      <article class="chart-panel">
+        <div class="panel-header">
+          <div>
+            <span>Casc</span>
+            <h2>Humitat</h2>
+          </div>
+          <strong>{formatValue(sensorData?.humidity_percent, ' %')}</strong>
+        </div>
+
+        <svg viewBox="0 0 {CHART_WIDTH} {CHART_HEIGHT}" role="img" aria-label="Historic d'humitat">
+          <path class="grid-line" d="M 16 34 H 304 M 16 75 H 304 M 16 116 H 304" />
+          <path class="area humidity-area" d={areaPath(humiditySeries)} />
+          <path class="series humidity" d={linePath(humiditySeries)} />
+          {#if humiditySeries.length < 2}
+            <text class="empty-label" x="160" y="80">Esperant dades</text>
+          {/if}
+        </svg>
+      </article>
+
+      <article class="chart-panel">
         <div class="panel-header">
           <div>
             <span>Seguretat</span>
-            <h2>Distancia de frenada</h2>
+            <h2>Proximitat posterior</h2>
           </div>
           <strong class={zoneClass(sensorData?.status?.zone)}>{formatValue(sensorData?.distance_mm, ' mm')}</strong>
         </div>
@@ -277,48 +280,6 @@
             {@const point = lastPoint(distanceSeries)}
             <circle class="dot distance" cx={point?.x} cy={point?.y} r="4" />
           {:else}
-            <text class="empty-label" x="160" y="80">Esperant dades</text>
-          {/if}
-        </svg>
-      </article>
-
-      <article class="chart-panel">
-        <div class="panel-header">
-          <div>
-            <span>Confort</span>
-            <h2>Temperatura / humitat</h2>
-          </div>
-        </div>
-
-        <svg viewBox="0 0 {CHART_WIDTH} {CHART_HEIGHT}" role="img" aria-label="Historic de temperatura i humitat">
-          <path class="grid-line" d="M 16 34 H 304 M 16 75 H 304 M 16 116 H 304" />
-          <path class="series temperature" d={linePath(temperatureSeries, [temperatureSeries, humiditySeries])} />
-          <path class="series humidity" d={linePath(humiditySeries, [temperatureSeries, humiditySeries])} />
-          {#if temperatureSeries.length < 2 && humiditySeries.length < 2}
-            <text class="empty-label" x="160" y="80">Esperant dades</text>
-          {/if}
-        </svg>
-
-        <div class="legend">
-          <span><i class="temperature"></i>Temperatura</span>
-          <span><i class="humidity"></i>Humitat</span>
-        </div>
-      </article>
-
-      <article class="chart-panel">
-        <div class="panel-header">
-          <div>
-            <span>Entorn</span>
-            <h2>Soroll ambiental</h2>
-          </div>
-          <strong class={zoneClass(sensorData?.environment?.noise?.zone)}>{formatValue(sensorData?.environment?.noise?.db_a, ' dB')}</strong>
-        </div>
-
-        <svg viewBox="0 0 {CHART_WIDTH} {CHART_HEIGHT}" role="img" aria-label="Historic de soroll">
-          <path class="grid-line" d="M 16 34 H 304 M 16 75 H 304 M 16 116 H 304" />
-          <path class="area noise-area" d={areaPath(noiseSeries)} />
-          <path class="series noise" d={linePath(noiseSeries)} />
-          {#if noiseSeries.length < 2}
             <text class="empty-label" x="160" y="80">Esperant dades</text>
           {/if}
         </svg>
@@ -348,6 +309,25 @@
           <span><i class="pm10"></i>PM10</span>
           <span><i class="no2"></i>NO2</span>
         </div>
+      </article>
+
+      <article class="chart-panel">
+        <div class="panel-header">
+          <div>
+            <span>Camera</span>
+            <h2>Deteccions</h2>
+          </div>
+          <strong class={zoneClass(sensorData?.object_detection?.proximity?.zone)}>{sensorData?.object_detection?.count ?? 0}</strong>
+        </div>
+
+        <svg viewBox="0 0 {CHART_WIDTH} {CHART_HEIGHT}" role="img" aria-label="Historic de deteccions">
+          <path class="grid-line" d="M 16 34 H 304 M 16 75 H 304 M 16 116 H 304" />
+          <path class="area detections-area" d={areaPath(detectionSeries)} />
+          <path class="series detections" d={linePath(detectionSeries)} />
+          {#if detectionSeries.length < 2}
+            <text class="empty-label" x="160" y="80">Esperant dades</text>
+          {/if}
+        </svg>
       </article>
 
       <article class="chart-panel limit-panel">
@@ -404,7 +384,6 @@
   }
 
   .eyebrow,
-  .metric-card span,
   .panel-header span {
     color: var(--grey-color);
     font-size: 0.72rem;
@@ -453,14 +432,14 @@
     background: #fee2e2;
   }
 
-  .metrics-grid {
+  .risk-grid {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: 1.4fr 1.2fr 1fr 1fr;
     gap: 10px;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
   }
 
-  .metric-card,
+  .risk-card,
   .chart-panel {
     border: 1px solid rgba(39, 39, 39, 0.08);
     border-radius: 8px;
@@ -468,22 +447,34 @@
     box-shadow: 0 10px 32px rgba(39, 39, 39, 0.04);
   }
 
-  .metric-card {
-    min-height: 112px;
+  .risk-card {
+    min-height: 132px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    gap: 10px;
-    padding: 14px;
+    gap: 12px;
+    padding: 16px;
   }
 
-  .metric-card strong {
+  .risk-card span {
+    color: var(--grey-color);
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .risk-card strong {
     color: var(--text-color);
-    font-size: 1.4rem;
-    line-height: 1.05;
+    font-size: 1.75rem;
+    line-height: 1;
   }
 
-  .metric-card small,
+  .risk-card.compact strong {
+    font-size: 1.25rem;
+  }
+
+  .risk-card small,
   .status-stack small {
     color: var(--grey-color);
     line-height: 1.35;
@@ -498,14 +489,6 @@
   .chart-panel {
     min-height: 244px;
     padding: 14px;
-  }
-
-  .chart-panel.wide {
-    grid-column: span 2;
-  }
-
-  .limit-panel {
-    min-height: 214px;
   }
 
   .panel-header {
@@ -554,33 +537,51 @@
     stroke-width: 2;
   }
 
-  .series.distance,
-  .series.noise {
+  .series.distance {
     stroke: var(--primary-color);
   }
 
   .distance-area,
-  .noise-area,
   .dot.distance {
     fill: var(--primary-color);
   }
 
-  .series.temperature,
+  .series.temperature {
+    stroke: var(--first-color);
+  }
+
+  .temperature-area {
+    fill: var(--first-color);
+  }
+
+  .series.humidity {
+    stroke: var(--third-color);
+  }
+
+  .humidity-area {
+    fill: var(--third-color);
+  }
+
+  .series.detections {
+    stroke: var(--second-color);
+  }
+
+  .detections-area {
+    fill: var(--second-color);
+  }
+
   .series.pm25 {
     stroke: var(--first-color);
   }
 
-  .legend i.temperature,
   .legend i.pm25 {
     background: var(--first-color);
   }
 
-  .series.humidity,
   .series.pm10 {
     stroke: var(--third-color);
   }
 
-  .legend i.humidity,
   .legend i.pm10 {
     background: var(--third-color);
   }
@@ -696,7 +697,7 @@
       align-items: flex-start;
     }
 
-    .metrics-grid {
+    .risk-grid {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
@@ -704,13 +705,10 @@
       grid-template-columns: 1fr;
     }
 
-    .chart-panel.wide {
-      grid-column: auto;
-    }
   }
 
   @media (max-width: 520px) {
-    .metrics-grid {
+    .risk-grid {
       grid-template-columns: 1fr;
     }
 
