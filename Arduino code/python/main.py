@@ -5,6 +5,7 @@ import time
 
 from PIL import Image, ImageDraw
 from fastapi.responses import StreamingResponse
+from fastapi.responses import JSONResponse
 
 from arduino.app_utils import *
 from arduino.app_bricks.web_ui import WebUI
@@ -12,7 +13,7 @@ from arduino.app_bricks.video_objectdetection import VideoObjectDetection
 
 logger = Logger("helmet-api")
 
-ui = WebUI(cors_origins="")
+ui = WebUI(addr="0.0.0.0", port=7000, cors_origins="")
 detection_stream = VideoObjectDetection(
     confidence=0.5,
     debounce_sec=0.0,
@@ -75,6 +76,13 @@ PROXIMITY_ZONES = {
     1: "WARNING",
     2: "DANGER",
     3: "CRITICAL",
+}
+API_HEADERS = {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "GET, OPTIONS",
+    "Access-Control-Allow-Headers": "*",
+    "Access-Control-Allow-Private-Network": "true",
+    "Cache-Control": "no-store",
 }
 
 ZONES = {
@@ -322,6 +330,7 @@ def get_camera():
     return StreamingResponse(
         camera_stream(),
         media_type="multipart/x-mixed-replace; boundary=frame",
+        headers=API_HEADERS,
     )
 
 
@@ -341,7 +350,11 @@ def get_sensors():
         }
         latest_detections = []
 
-    return latest_sensors
+    return JSONResponse(content=latest_sensors, headers=API_HEADERS)
+
+
+def api_options():
+    return JSONResponse(content={}, headers=API_HEADERS)
 
 
 try:
@@ -356,6 +369,12 @@ except RuntimeError:
 detection_stream.on_detect_all(record_detections)
 
 ui.expose_api("GET", "/cam", get_camera)
+ui.expose_api("OPTIONS", "/cam", api_options)
 ui.expose_api("GET", "/sensors", get_sensors)
+ui.expose_api("OPTIONS", "/sensors", api_options)
+ui.expose_api("GET", "/api/cam", get_camera)
+ui.expose_api("OPTIONS", "/api/cam", api_options)
+ui.expose_api("GET", "/api/sensors", get_sensors)
+ui.expose_api("OPTIONS", "/api/sensors", api_options)
 
 App.run()
